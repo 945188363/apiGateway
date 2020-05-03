@@ -10,7 +10,10 @@ const (
 	RuntimeLog = 2
 
 	// 监控类型
-
 	ELK        = "ELK"
 	Prometheus = "Prometheus"
+
+	// 插件类型
+	API      = "API"
+	Strategy = "策略"
 )
