@@ -11,7 +11,7 @@ func NewGinRouter() *gin.Engine {
 	{
 		v1GinGroup.GET("/prods", Handlers.GetProdsList)
 	}
-	ginRouter.POST( "/users", Handlers.GetUser)
+	ginRouter.POST("/users", Handlers.GetUser)
 
 	return ginRouter
 }
