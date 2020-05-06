@@ -18,6 +18,15 @@ import (
 
 var accessLog *logrus.Logger
 var runtimeLog *logrus.Logger
+var runtimeLogInfo *DBModels.LogInfo
+
+func Init() {
+	runtimeLogInfo.LogType = Config.RuntimeLog
+	err := runtimeLogInfo.GetLogInfoByType()
+	if err != nil {
+		return
+	}
+}
 
 func AccessLog(logInfo *DBModels.LogInfo) *logrus.Logger {
 
@@ -74,9 +83,9 @@ func AccessLog(logInfo *DBModels.LogInfo) *logrus.Logger {
 	return logger
 }
 
-func RuntimeLog(logInfo *DBModels.LogInfo) *logrus.Logger {
+func RuntimeLog() *logrus.Logger {
 	// 日志文件
-	fileName := path.Join(logInfo.LogAddress, logInfo.LogName)
+	fileName := path.Join(runtimeLogInfo.LogAddress, runtimeLogInfo.LogName)
 	// 写入文件
 	src, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err != nil {
@@ -91,7 +100,7 @@ func RuntimeLog(logInfo *DBModels.LogInfo) *logrus.Logger {
 
 	// 记录周期
 	var period int
-	switch logInfo.LogPeriod {
+	switch runtimeLogInfo.LogPeriod {
 	case Config.Hour:
 		period = 1
 	case Config.Day:
@@ -107,7 +116,7 @@ func RuntimeLog(logInfo *DBModels.LogInfo) *logrus.Logger {
 		rotatelogs.WithLinkName(fileName),
 
 		// 设置最大保存时间(默认天)
-		rotatelogs.WithMaxAge(time.Duration(logInfo.LogSavedTime)*24*time.Hour),
+		rotatelogs.WithMaxAge(time.Duration(runtimeLogInfo.LogSavedTime)*24*time.Hour),
 
 		// 设置日志切割时间间隔(1天)
 		rotatelogs.WithRotationTime(time.Duration(period)*time.Hour),
