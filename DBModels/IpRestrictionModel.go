@@ -29,7 +29,7 @@ func (p *IpRestriction) GetIpRestriction(api string) error {
 	return nil
 }
 
-func (p *IpRestriction) GetGlobalRestriction() error {
+func (p *IpRestriction) GetGlobalIpRestriction() error {
 	if err := DB.DBConn().Find(&p, "global = ?", 1).Error; err != nil {
 		log.Fatal(err)
 		return err

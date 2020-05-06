@@ -29,6 +29,14 @@ func (p *LogInfo) GetLogInfo() error {
 	return nil
 }
 
+func (p *LogInfo) GetLogInfoByType() error {
+	if err := DB.DBConn().Find(&p, "log_Type = ?", p.LogType).Error; err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
 func (p *LogInfo) SaveLogInfo() bool {
 	// 已存在更新，否则创建
 	exist := LogInfo{}

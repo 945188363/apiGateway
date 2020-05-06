@@ -16,4 +16,19 @@ const (
 	// 插件类型
 	API      = "API"
 	Strategy = "策略"
+
+	// MQ配置
+	MqUrl          = ""
+	MqUsername     = ""
+	MqPassword     = ""
+	MqExchange     = ""
+	MqExchangeType = ""
+	MqVirtualHost  = ""
+	MqQueueName    = ""
+	MqRoutingKey   = ""
+
+	// ES配置
+	EsUrl   = ""
+	EsIndex = ""
+	EsHost  = ""
 )
