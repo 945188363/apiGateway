@@ -17,53 +17,50 @@ func InitApiMapping() {
 		Utils.RuntimeLog().Info("get api list error", err)
 	}
 	apiListGroup := splitByGroup(apiList)
-
+	var httpInvoker HttpInvoker
 	for i := 0; i < len(apiListGroup); i++ {
 		for j := 0; j < len(apiListGroup[i]); j++ {
+			httpInvoker.Api = apiListGroup[i][j]
 			if apiListGroup[i][j].ApiGroup != "" {
 				group := router.Group("/" + apiListGroup[i][j].ApiGroup)
 				{
 					switch apiListGroup[i][j].ApiMethod {
-					case "ALL":
-						group.GET(apiListGroup[i][j].ApiUrl)
 					case "GET":
-						group.GET(apiListGroup[i][j].ApiUrl)
+						group.GET(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 					case "POST":
-						group.POST(apiListGroup[i][j].ApiUrl)
+						group.POST(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 					case "PUT":
-						group.PUT(apiListGroup[i][j].ApiUrl)
+						group.PUT(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 					case "PATCH":
-						group.PATCH(apiListGroup[i][j].ApiUrl)
+						group.PATCH(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 					case "DELETE":
-						group.DELETE(apiListGroup[i][j].ApiUrl)
+						group.DELETE(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 					case "OPTIONS":
-						group.OPTIONS(apiListGroup[i][j].ApiUrl)
+						group.OPTIONS(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 					case "HEAD":
-						group.HEAD(apiListGroup[i][j].ApiUrl)
+						group.HEAD(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 					default:
-						group.GET(apiListGroup[i][j].ApiUrl)
+						group.GET(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 					}
 				}
 			} else {
 				switch apiListGroup[i][j].ApiMethod {
-				case "ALL":
-					router.GET(apiListGroup[i][j].ApiUrl)
 				case "GET":
-					router.GET(apiListGroup[i][j].ApiUrl)
+					router.GET(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 				case "POST":
-					router.POST(apiListGroup[i][j].ApiUrl)
+					router.POST(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 				case "PUT":
-					router.PUT(apiListGroup[i][j].ApiUrl)
+					router.PUT(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 				case "PATCH":
-					router.PATCH(apiListGroup[i][j].ApiUrl)
+					router.PATCH(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 				case "DELETE":
-					router.DELETE(apiListGroup[i][j].ApiUrl)
+					router.DELETE(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 				case "OPTIONS":
-					router.OPTIONS(apiListGroup[i][j].ApiUrl)
+					router.OPTIONS(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 				case "HEAD":
-					router.HEAD(apiListGroup[i][j].ApiUrl)
+					router.HEAD(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 				default:
-					router.GET(apiListGroup[i][j].ApiUrl)
+					router.GET(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
 				}
 			}
 		}
