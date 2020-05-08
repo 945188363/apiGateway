@@ -1,0 +1,8 @@
+package Code
+
+const (
+	ERROR_AUTH_CHECK_TOKEN_FAIL    = 504
+	ERROR_AUTH_CHECK_TOKEN_TIMEOUT = 503
+
+	SUCCESS = 203
+)

@@ -6,8 +6,7 @@ import (
 	"apiGateway/Utils"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"net/http"
-	"strings"
+	"runtime/debug"
 	"time"
 )
 
@@ -17,41 +16,11 @@ func HeadMiddleware() gin.HandlerFunc {
 		c.Request.Header.Set("Access-Control-Allow-Origin", "*")
 		c.Request.Header.Add("Access-Control-Allow-Headers", "Content-Type")
 		c.Request.Header.Set("content-type", "application/json")
+		c.Next()
 	}
 }
 
-// 黑白名单中间件
-func IpRestrictionMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		remoteIp := Utils.RealIP(c.Request)
-		globalIpRestriction := DBModels.IpRestriction{}
-		err := globalIpRestriction.GetGlobalIpRestriction()
-		if err != nil {
-			return
-		}
-		IpBlackList := strings.Split(globalIpRestriction.IpBlackList, ",")
-		IpWhiteList := strings.Split(globalIpRestriction.IpWhiteList, ",")
-
-		// 未设置黑名单直接放行
-		if len(IpWhiteList) == 0 && len(IpBlackList) == 0 {
-			c.Next()
-			return
-		}
-		// 设置白名单后，且在白名单里，请求放行
-		if Utils.Contain(remoteIp, IpWhiteList) && len(IpWhiteList) > 0 {
-			c.Next()
-			return
-		}
-		// 设置黑名单后，且在黑名单里，则组织访问
-		if Utils.Contain(remoteIp, IpBlackList) && len(IpBlackList) > 0 {
-			c.Abort()
-			c.JSON(http.StatusForbidden, gin.H{
-				"message": "your ip is in ipBlackList.",
-			})
-		}
-	}
-}
-
+// 日志中间件
 func LoggerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		accessLogInfo := DBModels.LogInfo{}
@@ -99,5 +68,17 @@ func LoggerMiddleware() gin.HandlerFunc {
 			"retry":        retry,
 			"host":         host,
 		}).Info()
+	}
+}
+
+// 全局panic恢复中间件
+func Recovery() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				Utils.RuntimeLog().Errorf("unknown panic: [%s], stacktrace: [%s]", err, debug.Stack())
+			}
+		}()
+		c.Next()
 	}
 }

@@ -22,7 +22,7 @@ func (p *LogInfo) TableName() string {
 }
 
 func (p *LogInfo) GetLogInfo() error {
-	if err := DB.DBConn().Find(&p, "log_name = ?", p.LogName).Error; err != nil {
+	if err := DB.DBConn().First(&p, p).Error; err != nil {
 		log.Fatal(err)
 		return err
 	}
@@ -40,7 +40,7 @@ func (p *LogInfo) GetLogInfoByType() error {
 func (p *LogInfo) SaveLogInfo() bool {
 	// 已存在更新，否则创建
 	exist := LogInfo{}
-	DB.DBConn().Find(&exist, "log_name=?", p.LogName)
+	DB.DBConn().First(&exist, p)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
 			log.Fatal(err)
@@ -56,7 +56,7 @@ func (p *LogInfo) SaveLogInfo() bool {
 }
 
 func (p *LogInfo) DeleteLogInfo() bool {
-	if err := DB.DBConn().Where("log_name = ?", p.LogName).Delete(&p).Error; err != nil {
+	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
 		log.Fatal(err)
 		return false
 	}

@@ -19,7 +19,7 @@ func (p *LoadBalance) TableName() string {
 }
 
 func (p *LoadBalance) GetLoadBalance() error {
-	if err := DB.DBConn().Find(&p, "Name = ?", p.Name).Error; err != nil {
+	if err := DB.DBConn().First(&p, p).Error; err != nil {
 		log.Fatal(err)
 		return err
 	}
@@ -27,7 +27,7 @@ func (p *LoadBalance) GetLoadBalance() error {
 }
 
 func (p *LoadBalance) GetLoadBalanceByServiceName(serviceName string) error {
-	if err := DB.DBConn().Find(&p, "log_period like ?", serviceName).Error; err != nil {
+	if err := DB.DBConn().First(&p, "log_period like ?", serviceName).Error; err != nil {
 		log.Fatal(err)
 		return err
 	}
@@ -37,7 +37,7 @@ func (p *LoadBalance) GetLoadBalanceByServiceName(serviceName string) error {
 func (p *LoadBalance) SaveLoadBalance() bool {
 	// 已存在更新，否则创建
 	exist := LogInfo{}
-	DB.DBConn().Find(&exist, "Name=?", p.Name)
+	DB.DBConn().First(&exist, p)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
 			log.Fatal(err)
@@ -53,7 +53,7 @@ func (p *LoadBalance) SaveLoadBalance() bool {
 }
 
 func (p *LoadBalance) DeleteLoadBalance() bool {
-	if err := DB.DBConn().Where("Name = ?", p.Name).Delete(&p).Error; err != nil {
+	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
 		log.Fatal(err)
 		return false
 	}

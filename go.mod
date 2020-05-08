@@ -3,7 +3,11 @@ module apiGateway
 go 1.14
 
 require (
+	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
+	github.com/franela/goblin v0.0.0-20200409142057-1def193310bb // indirect
 	github.com/gin-gonic/gin v1.6.2
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
@@ -12,7 +16,7 @@ require (
 	github.com/lestrrat-go/file-rotatelogs v2.3.0+incompatible
 	github.com/lestrrat-go/strftime v1.0.1 // indirect
 	github.com/micro/go-micro v1.18.0
-    github.com/micro/go-plugins v1.5.1
+	github.com/micro/go-plugins v1.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/sirupsen/logrus v1.6.0

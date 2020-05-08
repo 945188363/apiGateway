@@ -21,8 +21,8 @@ func (p *IpRestriction) TableName() string {
 	return "LogInfo"
 }
 
-func (p *IpRestriction) GetIpRestriction(api string) error {
-	if err := DB.DBConn().Find(&p, "api_list like ? and global = ?", api, 0).Error; err != nil {
+func (p *IpRestriction) GetIpRestrictionByApi(api string) error {
+	if err := DB.DBConn().First(&p, "api_list like ? and global = ?", api, 0).Error; err != nil {
 		log.Fatal(err)
 		return err
 	}
@@ -30,7 +30,7 @@ func (p *IpRestriction) GetIpRestriction(api string) error {
 }
 
 func (p *IpRestriction) GetGlobalIpRestriction() error {
-	if err := DB.DBConn().Find(&p, "global = ?", 1).Error; err != nil {
+	if err := DB.DBConn().First(&p, "global = ?", 1).Error; err != nil {
 		log.Fatal(err)
 		return err
 	}
@@ -40,7 +40,7 @@ func (p *IpRestriction) GetGlobalIpRestriction() error {
 func (p *IpRestriction) SaveIpRestriction() bool {
 	// 已存在更新，否则创建
 	exist := IpRestriction{}
-	DB.DBConn().Find(&exist, "name = ?", p.Name)
+	DB.DBConn().First(&exist, p)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
 			log.Fatal(err)
@@ -56,7 +56,7 @@ func (p *IpRestriction) SaveIpRestriction() bool {
 }
 
 func (p *IpRestriction) DeleteIpRestriction() bool {
-	if err := DB.DBConn().Where("name = ?", p.Name).Delete(&p).Error; err != nil {
+	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
 		log.Fatal(err)
 		return false
 	}

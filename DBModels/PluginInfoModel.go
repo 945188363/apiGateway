@@ -19,7 +19,7 @@ func (p *PluginInfo) TableName() string {
 }
 
 func (p *PluginInfo) GetPluginInfo() error {
-	if err := DB.DBConn().Find(&p, "plugin_name = ?", p.PluginName).Error; err != nil {
+	if err := DB.DBConn().First(&p, p).Error; err != nil {
 		log.Fatal(err)
 		return err
 	}
@@ -29,7 +29,7 @@ func (p *PluginInfo) GetPluginInfo() error {
 func (p *PluginInfo) SavePluginInfo() bool {
 	// 已存在更新，否则创建
 	exist := PluginInfo{}
-	DB.DBConn().Find(&exist, "plugin_name=?", p.PluginName)
+	DB.DBConn().First(&exist, p)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
 			log.Fatal(err)
@@ -45,7 +45,7 @@ func (p *PluginInfo) SavePluginInfo() bool {
 }
 
 func (p *PluginInfo) DeletePluginInfo() bool {
-	if err := DB.DBConn().Where("plugin_name = ?", p.PluginName).Delete(&p).Error; err != nil {
+	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
 		log.Fatal(err)
 		return false
 	}

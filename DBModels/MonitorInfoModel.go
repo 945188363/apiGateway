@@ -18,7 +18,7 @@ func (p *MonitorInfo) TableName() string {
 }
 
 func (p *MonitorInfo) GetMonitorInfo() error {
-	if err := DB.DBConn().Find(&p, "monitor_type = ?", p.MonitorType).Error; err != nil {
+	if err := DB.DBConn().First(&p, p).Error; err != nil {
 		log.Fatal(err)
 		return err
 	}
@@ -28,7 +28,7 @@ func (p *MonitorInfo) GetMonitorInfo() error {
 func (p *MonitorInfo) SaveMonitorInfo() bool {
 	// 已存在更新，否则创建
 	exist := MonitorInfo{}
-	DB.DBConn().Find(&exist, "monitor_type=?", p.MonitorType)
+	DB.DBConn().First(&exist, p)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
 			log.Fatal(err)
@@ -44,7 +44,7 @@ func (p *MonitorInfo) SaveMonitorInfo() bool {
 }
 
 func (p *MonitorInfo) DeleteMonitorInfo() bool {
-	if err := DB.DBConn().Where("monitor_type = ?", p.MonitorType).Delete(&p).Error; err != nil {
+	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
 		log.Fatal(err)
 		return false
 	}
