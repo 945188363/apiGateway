@@ -10,7 +10,6 @@ import (
 func Run() {
 	// gin 运行时 release debug test
 	gin.SetMode(Config.Env)
-
 	// 注册路由
 	router := Routers.NewGinRouter()
 

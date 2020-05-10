@@ -7,7 +7,7 @@ import (
 
 type LoadBalance struct {
 	Id           int    `gorm:"column:id;primary_key;AUTO_INCREMENT"`
-	Name         int    `gorm:"column:name;type:varchar(50);not null;unique_index"`
+	Name         string `gorm:"column:name;type:varchar(50);not null;unique_index"`
 	RegistryName string `gorm:"column:registry_name;type:varchar(50);not null;"`
 	Strategy     string `gorm:"column:strategy;type:varchar(50);not null;default:'random'"`
 	ServiceName  string `gorm:"column:service_name;type:text"`

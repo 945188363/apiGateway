@@ -10,7 +10,7 @@ type Api struct {
 	ApiName          string `gorm:"column:api_name;type:varchar(50);not null;unique_index"`
 	ApiUrl           string `gorm:"column:api_url;type:varchar(255);not null"`
 	BackendUrl       string `gorm:"column:backend_url;type:varchar(255);not null"`
-	ApiMethod        string `gorm:"column:api_method;type:varchar(50);not null"`
+	ApiMethod        string `gorm:"column:api_method;type:varchar(50);not null;default:'post'"`
 	ApiTimeout       int    `gorm:"column:api_timeout;type:int(11);DEFAULT:3000"`
 	ApiRetry         int    `gorm:"column:api_retry;type:int(11);DEFAULT:3"`
 	ApiReturnContent string `gorm:"column:api_return_content;type:text"`
@@ -20,6 +20,15 @@ type Api struct {
 // 设置User的表名为`Api`
 func (p *Api) TableName() string {
 	return "Api"
+}
+
+func (p *Api) GetApiByGroup(apiGroupName string) ([]Api, error) {
+	var apiList []Api
+	if err := DB.DBConn().Find(&apiList, "api_group = ?", apiGroupName).Error; err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	return apiList, nil
 }
 
 func (p *Api) GetApi() error {
