@@ -22,7 +22,7 @@ func GetApiGroupList(ginCtx *gin.Context) {
 	var apiGroup ApiGroup
 	ginCtx.Bind(&apiGroup)
 	var apiGroupModel DBModels.ApiGroup
-	Utils.CopyFields(apiGroupModel, apiGroup,
+	Utils.CopyFields(&apiGroupModel, apiGroup,
 		"ApiGroupName",
 		"Description")
 	apiGroupList, err := apiGroupModel.GetApiGroupList()
@@ -39,7 +39,7 @@ func GetApiGroupList(ginCtx *gin.Context) {
 		})
 	}
 	ginCtx.JSON(200, gin.H{
-		"message": "query api list success",
+		"message": "query api group list success",
 		"data":    apiGroupList,
 	})
 }
@@ -52,7 +52,7 @@ func SaveApiGroup(ginCtx *gin.Context) {
 	var apiGroup ApiGroup
 	ginCtx.Bind(&apiGroup)
 	var apiGroupModel DBModels.ApiGroup
-	Utils.CopyFields(apiGroupModel, apiGroup,
+	Utils.CopyFields(&apiGroupModel, apiGroup,
 		"ApiGroupName",
 		"Description")
 	saveApiGroup := apiGroupModel.SaveApiGroup()
@@ -71,7 +71,7 @@ func DeleteApiGroup(ginCtx *gin.Context) {
 	var apiGroup ApiGroup
 	ginCtx.Bind(&apiGroup)
 	var apiGroupModel DBModels.ApiGroup
-	Utils.CopyFields(apiGroupModel, apiGroup,
+	Utils.CopyFields(&apiGroupModel, apiGroup,
 		"ApiGroupName",
 		"Description")
 	delApiGroup := apiGroupModel.DeleteApiGroup()

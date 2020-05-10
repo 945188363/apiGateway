@@ -42,7 +42,7 @@ func (p *Api) GetApi() error {
 func (p *Api) SaveApi() bool {
 	// 已存在更新，否则创建
 	exist := Api{}
-	DB.DBConn().First(&exist, p)
+	DB.DBConn().First(&exist, "api_name = ?", p.ApiName)
 	if exist.Id != 0 {
 		updateApi := Api{
 			ApiName:          p.ApiName,

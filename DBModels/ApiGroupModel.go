@@ -27,7 +27,7 @@ func (p *ApiGroup) GetApiGroup() error {
 func (p *ApiGroup) SaveApiGroup() bool {
 	// 已存在更新，否则创建
 	exist := ApiGroup{}
-	DB.DBConn().First(&exist, p)
+	DB.DBConn().First(&exist, "api_group_name = ?", p.ApiGroupName)
 	if exist.Id != 0 {
 		updateApi := ApiGroup{
 			ApiGroupName: p.ApiGroupName,

@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"reflect"
-	"strconv"
 )
 
 type Api struct {
@@ -14,8 +13,8 @@ type Api struct {
 	ApiUrl           string `form:"ApiUrl"`
 	BackendUrl       string `form:"BackendUrl"`
 	ApiMethod        string `form:"ApiMethod"`
-	ApiTimeout       string `form:"ApiTimeout"`
-	ApiRetry         string `form:"ApiRetry"`
+	ApiTimeout       int    `form:"ApiTimeout"`
+	ApiRetry         int    `form:"ApiRetry"`
 	ApiReturnContent string `form:"ApiReturnContent"`
 	ApiGroup         string `form:"ApiGroup"`
 }
@@ -40,7 +39,7 @@ func GetApiLst(ginCtx *gin.Context) {
 	}
 
 	ginCtx.JSON(200, gin.H{
-		"message": "query api list error",
+		"message": "query api list success",
 		"data":    apiList,
 	})
 }
@@ -83,15 +82,7 @@ func SaveApi(ginCtx *gin.Context) {
 	var api Api
 	ginCtx.Bind(&api)
 	var apiModel DBModels.Api
-	Utils.CopyFields(&apiModel, api,
-		"ApiName",
-		"ApiUrl",
-		"BackendUrl",
-		"ApiMethod",
-		"ApiReturnContent",
-		"ApiGroup")
-	apiModel.ApiRetry, _ = strconv.Atoi(api.ApiRetry)
-	apiModel.ApiTimeout, _ = strconv.Atoi(api.ApiTimeout)
+	Utils.CopyFields(&apiModel, api)
 	saveApi := apiModel.SaveApi()
 	if saveApi {
 		ginCtx.JSON(200, gin.H{
@@ -108,15 +99,7 @@ func DeleteApi(ginCtx *gin.Context) {
 	var api Api
 	ginCtx.Bind(&api)
 	var apiModel DBModels.Api
-	Utils.CopyFields(&apiModel, api,
-		"ApiName",
-		"ApiUrl",
-		"BackendUrl",
-		"ApiMethod",
-		"ApiReturnContent",
-		"ApiGroup")
-	apiModel.ApiRetry, _ = strconv.Atoi(api.ApiRetry)
-	apiModel.ApiTimeout, _ = strconv.Atoi(api.ApiTimeout)
+	Utils.CopyFields(&apiModel, api)
 	delApi := apiModel.DeleteApi()
 	if delApi {
 		ginCtx.JSON(200, gin.H{
