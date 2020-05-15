@@ -20,12 +20,12 @@ func NewGinRouter() *gin.Engine {
 		gateway.POST("/createApiDetail", Handlers.SaveApi)
 		gateway.GET("/queryApiDetailList", Handlers.GetApiLst)
 		gateway.POST("/updateApiDetail", Handlers.SaveApi)
-		gateway.DELETE("deleteApiDetail", Handlers.DeleteApi)
+		gateway.POST("deleteApiDetail", Handlers.DeleteApi)
 		// api group 相关路由
 		gateway.POST("/createApiGroupDetail", Handlers.SaveApiGroup)
 		gateway.GET("/queryApiGroupList", Handlers.GetApiGroupList)
 		gateway.POST("/updateApiGroupDetail", Handlers.SaveApiGroup)
-		gateway.DELETE("/deleteApiGroupDetail", Handlers.DeleteApiGroup)
+		gateway.POST("/deleteApiGroupDetail", Handlers.DeleteApiGroup)
 	}
 	ginRouter.POST("/users", Handlers.GetUser)
 

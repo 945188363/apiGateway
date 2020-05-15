@@ -3,6 +3,7 @@ package Handlers
 import (
 	"apiGateway/DBModels"
 	"apiGateway/Utils"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"reflect"
@@ -15,6 +16,7 @@ type Api struct {
 	ApiMethod        string `form:"ApiMethod"`
 	ApiTimeout       int    `form:"ApiTimeout"`
 	ApiRetry         int    `form:"ApiRetry"`
+	ApiReturnType    string `form:"ApiReturnType"`
 	ApiReturnContent string `form:"ApiReturnContent"`
 	ApiGroup         string `form:"ApiGroup"`
 }
@@ -81,8 +83,11 @@ func GetApiByGroup(ginCtx *gin.Context) {
 func SaveApi(ginCtx *gin.Context) {
 	var api Api
 	ginCtx.Bind(&api)
+	fmt.Println(api)
 	var apiModel DBModels.Api
 	Utils.CopyFields(&apiModel, api)
+	fmt.Println(apiModel)
+
 	saveApi := apiModel.SaveApi()
 	if saveApi {
 		ginCtx.JSON(200, gin.H{

@@ -13,6 +13,7 @@ type Api struct {
 	ApiMethod        string `gorm:"column:api_method;type:varchar(50);not null;default:'post'"`
 	ApiTimeout       int    `gorm:"column:api_timeout;type:int(11);DEFAULT:3000"`
 	ApiRetry         int    `gorm:"column:api_retry;type:int(11);DEFAULT:3"`
+	ApiReturnType    string `gorm:"column:api_return_type;type:varchar(50);default:'RAW'"`
 	ApiReturnContent string `gorm:"column:api_return_content;type:text"`
 	ApiGroup         string `gorm:"column:api_group;type:varchar(50);not null;"`
 }
@@ -51,6 +52,7 @@ func (p *Api) SaveApi() bool {
 			ApiMethod:        p.ApiMethod,
 			ApiTimeout:       p.ApiTimeout,
 			ApiRetry:         p.ApiRetry,
+			ApiReturnType:    p.ApiReturnType,
 			ApiReturnContent: p.ApiReturnContent,
 			ApiGroup:         p.ApiGroup,
 		}

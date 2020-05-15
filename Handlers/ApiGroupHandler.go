@@ -19,12 +19,7 @@ func (a ApiGroup) IsEmpty() bool {
 
 // ApiGroup相关处理
 func GetApiGroupList(ginCtx *gin.Context) {
-	var apiGroup ApiGroup
-	ginCtx.Bind(&apiGroup)
 	var apiGroupModel DBModels.ApiGroup
-	Utils.CopyFields(&apiGroupModel, apiGroup,
-		"ApiGroupName",
-		"Description")
 	apiGroupList, err := apiGroupModel.GetApiGroupList()
 	if err != nil {
 		ginCtx.JSON(http.StatusInternalServerError, gin.H{
