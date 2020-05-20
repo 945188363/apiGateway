@@ -45,7 +45,7 @@ func (p *HttpInvoker) execute(ginCtx *gin.Context) {
 	case Config.Get:
 		resp, err := http.Get(p.host + p.BackendUrl)
 		if err != nil {
-			Utils.RuntimeLog().Info("do Get request error .", err)
+			// Utils.RuntimeLog().Info("do Get request error .", err)
 			return
 		}
 		ginCtx.JSON(http.StatusAccepted, resp)

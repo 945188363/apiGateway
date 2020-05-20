@@ -1,6 +1,7 @@
 package Routers
 
 import (
+	"apiGateway/Core"
 	"apiGateway/Handlers"
 	"apiGateway/Middlewares"
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,6 @@ func NewGinRouter() *gin.Engine {
 		gateway.POST("/deleteApiGroupDetail", Handlers.DeleteApiGroup)
 	}
 	ginRouter.POST("/users", Handlers.GetUser)
-
+	Core.InitApiMapping(ginRouter)
 	return ginRouter
 }

@@ -9,6 +9,7 @@ type Api struct {
 	Id               int    `gorm:"column:id;primary_key;AUTO_INCREMENT"`
 	ApiName          string `gorm:"column:api_name;type:varchar(50);not null;unique_index"`
 	ApiUrl           string `gorm:"column:api_url;type:varchar(255);not null"`
+	ProtocolType     string `gorm:"column:protocol_type;type:varchar(50);not null;default:'http'"`
 	BackendUrl       string `gorm:"column:backend_url;type:varchar(255);not null"`
 	ApiMethod        string `gorm:"column:api_method;type:varchar(50);not null;default:'post'"`
 	ApiTimeout       int    `gorm:"column:api_timeout;type:int(11);DEFAULT:3000"`

@@ -27,7 +27,7 @@ func (p *LoadBalance) GetLoadBalance() error {
 }
 
 func (p *LoadBalance) GetLoadBalanceByServiceName(serviceName string) error {
-	if err := DB.DBConn().First(&p, "log_period like ?", serviceName).Error; err != nil {
+	if err := DB.DBConn().First(&p, "service_name like ?", serviceName).Error; err != nil {
 		log.Fatal(err)
 		return err
 	}
