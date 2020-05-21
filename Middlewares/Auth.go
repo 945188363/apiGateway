@@ -7,6 +7,7 @@ import (
 	"apiGateway/Utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -17,12 +18,11 @@ type AuthMw struct {
 func (mw *AuthMw) JWTAuthMiddleware() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-
-		if url := c.Request.URL.String(); url == "/login" {
+		// 如果是网关操作的接口直接放行
+		if url := c.Request.URL.String(); strings.HasPrefix(url, "/gateway") {
 			c.Next()
 			return
 		}
-
 		var data interface{}
 		msg := Message.SUCCESS
 		code := Code.SUCCESS
@@ -79,16 +79,29 @@ func (mw *AuthMw) AkSkAuthMiddleware() gin.HandlerFunc {
 
 func (mw *AuthMw) BasicAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if cookie, err := c.Request.Cookie("token"); err == nil {
-			value := cookie.Value
-			if value == "tokenValue" {
+		// 如果是网关操作的接口直接放行
+		if url := c.Request.URL.String(); strings.HasPrefix(url, "/gateway") {
+			c.Next()
+			return
+		}
+		token := c.Query("token")
+		if token == "" {
+			if cookie, err := c.Request.Cookie("token"); err == nil {
+				value := cookie.Value
+				if value == "tokenValue" {
+					c.Next()
+					return
+				}
+			}
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Unauthorized",
+			})
+			c.Abort()
+		} else {
+			if token == "tokenValue" {
 				c.Next()
 				return
 			}
-		}
-		if url := c.Request.URL.String(); url == "/login" {
-			c.Next()
-			return
 		}
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Unauthorized",

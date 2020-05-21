@@ -12,6 +12,7 @@ type Api struct {
 	ProtocolType     string `gorm:"column:protocol_type;type:varchar(50);not null;default:'http'"`
 	BackendUrl       string `gorm:"column:backend_url;type:varchar(255);not null"`
 	ApiMethod        string `gorm:"column:api_method;type:varchar(50);not null;default:'post'"`
+	RateLimiterNum   int    `gorm:"column:rate_limiter_num;type:int(11);not null;DEFAULT:0"`
 	ApiTimeout       int    `gorm:"column:api_timeout;type:int(11);DEFAULT:3000"`
 	ApiRetry         int    `gorm:"column:api_retry;type:int(11);DEFAULT:3"`
 	ApiReturnType    string `gorm:"column:api_return_type;type:varchar(50);default:'RAW'"`

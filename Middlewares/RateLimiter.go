@@ -8,11 +8,10 @@ import (
 
 type RateLimiterMw struct {
 	DBModels.Api
-	RateLimiterNum int
 }
 
 // 限流中间件
-func (mw *RateLimiterMw) BasicAuthMiddleware() gin.HandlerFunc {
+func (mw *RateLimiterMw) RateLimitMiddleware() gin.HandlerFunc {
 	lmt := tollbooth.NewLimiter(float64(mw.RateLimiterNum), nil)
 	lmt.SetMessage("error,request too many times,you are limited")
 	return func(c *gin.Context) {

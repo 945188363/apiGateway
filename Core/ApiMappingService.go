@@ -2,6 +2,7 @@ package Core
 
 import (
 	"apiGateway/DBModels"
+	"apiGateway/Middlewares"
 	"apiGateway/Utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -10,8 +11,13 @@ import (
 
 // 初始化路由
 func InitApiMapping(router *gin.Engine) {
-	// auth := Middlewares.AuthMw{}
-	// router.Use(auth.JWTAuthMiddleware())
+	// 鉴权
+	auth := Middlewares.AuthMw{}
+	router.Use(auth.BasicAuthMiddleware())
+	// 限流
+	ratelimit := Middlewares.RateLimiterMw{}
+	// 熔断
+	breaker := Middlewares.BreakerMw{}
 	api := DBModels.Api{}
 	apiList, err := api.GetApiList()
 	// 根据apiGroup分组
@@ -22,14 +28,13 @@ func InitApiMapping(router *gin.Engine) {
 	var httpInvoker HttpInvoker
 	for i := 0; i < len(apiListGroup); i++ {
 		for j := 0; j < len(apiListGroup[i]); j++ {
+			ratelimit.Api = apiListGroup[i][j]
 			httpInvoker.Api = apiListGroup[i][j]
-			var url string
-			if apiListGroup[i][j].ApiGroup != "" {
-				url = fmt.Sprintf("/%s/%s", apiListGroup[i][j].ApiGroup, apiListGroup[i][j].ApiUrl)
+			if ratelimit.RateLimiterNum > 0 {
+				router.Any(handleUrl(apiListGroup[i][j]), httpInvoker.execute, ratelimit.RateLimitMiddleware(), breaker.CircuitBreakerMiddleware())
 			} else {
-				url = apiListGroup[i][j].ApiUrl
+				router.Any(handleUrl(apiListGroup[i][j]), httpInvoker.execute, breaker.CircuitBreakerMiddleware())
 			}
-			router.Any(url, httpInvoker.execute)
 			// if apiListGroup[i][j].ApiGroup != "" {
 			// 	group := router.Group("/" + apiListGroup[i][j].ApiGroup)
 			// 	{
@@ -74,6 +79,19 @@ func InitApiMapping(router *gin.Engine) {
 			// }
 		}
 	}
+}
+
+// URL处理
+func handleUrl(api DBModels.Api) string {
+	var url string
+	// 处理URI
+	if api.ApiGroup != "" {
+		url = fmt.Sprintf("/%s/%s", api.ApiGroup, api.ApiUrl)
+	} else {
+		url = api.ApiUrl
+	}
+
+	return url
 }
 
 type sortList []DBModels.Api
