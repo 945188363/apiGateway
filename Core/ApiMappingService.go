@@ -29,11 +29,12 @@ func InitApiMapping(router *gin.Engine) {
 	for i := 0; i < len(apiListGroup); i++ {
 		for j := 0; j < len(apiListGroup[i]); j++ {
 			ratelimit.Api = apiListGroup[i][j]
+			breaker.Api = apiListGroup[i][j]
 			httpInvoker.Api = apiListGroup[i][j]
 			if ratelimit.RateLimiterNum > 0 {
-				router.Any(handleUrl(apiListGroup[i][j]), httpInvoker.execute, ratelimit.RateLimitMiddleware(), breaker.CircuitBreakerMiddleware())
+				router.Any(handleUrl(apiListGroup[i][j]), ratelimit.RateLimitMiddleware(), breaker.CircuitBreakerMiddleware(), httpInvoker.Execute)
 			} else {
-				router.Any(handleUrl(apiListGroup[i][j]), httpInvoker.execute, breaker.CircuitBreakerMiddleware())
+				router.Any(handleUrl(apiListGroup[i][j]), breaker.CircuitBreakerMiddleware(), httpInvoker.Execute)
 			}
 			// if apiListGroup[i][j].ApiGroup != "" {
 			// 	group := router.Group("/" + apiListGroup[i][j].ApiGroup)

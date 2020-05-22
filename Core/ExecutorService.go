@@ -32,21 +32,23 @@ type HttpInvoker struct {
 	DBModels.Api
 }
 
-func (p *HttpInvoker) execute(ginCtx *gin.Context) {
+func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 	// 先获取该服务在注册中心的集群数量 通过负载均衡选在一个server
 	p.discovery()
+	// 接收返回数据的chan，用在go程返回
+	doneChan := make(chan Message)
+	// 使用模板调用相关服务
+	// MethodExecute(p,ginCtx,doneChan)
 
 	// 获取到已经wrapper超时的上下文
 	ctx := ginCtx.Request.Context()
-	// 接收返回数据的chan，用在go程返回
-	doneChan := make(chan Message)
 	// 使用httpClient调用相关服务
 	switch p.ApiMethod {
 	case Config.Post:
 		go func() {
 			resp, err := http.PostForm(handleProtocol(p.ProtocolType, p.host, p.BackendUrl), ginCtx.Request.Form)
 			if err != nil {
-				Utils.RuntimeLog().Info("send Post request error .", err)
+				Utils.RuntimeLog().Info("do Get request error .", err)
 				return
 			}
 			defer resp.Body.Close()
@@ -121,6 +123,61 @@ func (p *HttpInvoker) execute(ginCtx *gin.Context) {
 			return
 		}
 		ginCtx.JSON(http.StatusAccepted, string(body))
+	}
+}
+
+// 模板方法处理
+func MethodExecute(p *HttpInvoker, ginCtx *gin.Context, doneChan chan Message) {
+	// 获取到已经wrapper超时的上下文
+	ctx := ginCtx.Request.Context()
+	go func() {
+		var err error
+		var resp *http.Response
+		switch p.ApiMethod {
+		case Config.Post:
+			resp, err = http.PostForm(handleProtocol(p.ProtocolType, p.host, p.BackendUrl), ginCtx.Request.Form)
+			break
+		case Config.Get:
+			resp, err = http.Get(handleProtocol(p.ProtocolType, p.host, p.BackendUrl))
+			break
+		default:
+			client := &http.Client{
+				Timeout: time.Duration(p.ApiTimeout) * time.Millisecond,
+			}
+			req, err := http.NewRequest(p.ApiMethod, handleProtocol(p.ProtocolType, p.host, p.BackendUrl), ginCtx.Request.Body)
+			if err != nil {
+				Utils.RuntimeLog().Info("send request error .", err)
+				return
+			}
+			resp, err = client.Do(req)
+		}
+		// 错误处理
+		if err != nil {
+			Utils.RuntimeLog().Info("send request error .", err)
+			return
+		}
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			Utils.RuntimeLog().Info("read body error .", err)
+			return
+		}
+		var msg Message
+		err = json.Unmarshal(body, &msg)
+		if err != nil {
+			Utils.RuntimeLog().Info("json transfer error .", err)
+			return
+		}
+		doneChan <- msg
+	}()
+	// 监听通道是否超时或者完成
+	select {
+	// 如果上下文超时，或者被cancel则不返回数据
+	case <-ctx.Done():
+		return
+	// 如果调用完成则写数据
+	case res := <-doneChan:
+		ginCtx.JSON(res.Code, res)
 	}
 }
 
