@@ -7,30 +7,22 @@ import (
 	"apiGateway/Utils"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/micro/go-micro/registry"
 	"io/ioutil"
 	"net/http"
 	"time"
 )
 
 type Executor interface {
-	execute(ginCtx *gin.Context)
+	Execute(ginCtx *gin.Context)
 }
 
-type Selector struct {
-	host string
-	LoadBalance
-}
-
-type LoadBalance struct {
-	LBType   string
-	Strategy string
-	Addr     string
+type Invoker struct {
+	Selector
+	DBModels.Api
 }
 
 type HttpInvoker struct {
-	Selector
-	DBModels.Api
+	Invoker
 }
 
 func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
@@ -73,7 +65,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 			return
 		// 如果调用完成则写数据
 		case res := <-doneChan:
-			ginCtx.JSON(res.Code, res)
+			handleResponseReturn(res, p.ApiReturnType, ginCtx)
 		}
 	case Config.Get:
 		go func() {
@@ -103,7 +95,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 			return
 		// 如果调用完成则写数据
 		case res := <-doneChan:
-			ginCtx.JSON(res.Code, res)
+			handleResponseReturn(res, p.ApiReturnType, ginCtx)
 		}
 	default:
 		client := &http.Client{
@@ -157,18 +149,7 @@ func MethodExecute(p *HttpInvoker, ginCtx *gin.Context, doneChan chan Domain.Mes
 			Utils.RuntimeLog().Info("send request error .", err)
 			return
 		}
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			Utils.RuntimeLog().Info("read body error .", err)
-			return
-		}
-		var msg Domain.Message
-		err = json.Unmarshal(body, &msg)
-		if err != nil {
-			Utils.RuntimeLog().Info("json transfer error .", err)
-			return
-		}
+		msg := handlePreResponse(resp)
 		doneChan <- msg
 	}()
 	// 监听通道是否超时或者完成
@@ -178,7 +159,7 @@ func MethodExecute(p *HttpInvoker, ginCtx *gin.Context, doneChan chan Domain.Mes
 		return
 	// 如果调用完成则写数据
 	case res := <-doneChan:
-		ginCtx.JSON(res.Code, res)
+		handleResponseReturn(res, p.ApiReturnType, ginCtx)
 	}
 }
 
@@ -191,55 +172,38 @@ func handleProtocol(protocolType, host, uri string) string {
 	return addr
 }
 
-// 选择服务
-func (p *HttpInvoker) selectService(servicesList []*registry.Service) string {
-	return GetAddr(servicesList, p.Strategy)
+func handlePreResponse(resp *http.Response) Domain.Message {
+	defer resp.Body.Close()
+	var msg Domain.Message
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		Utils.RuntimeLog().Info("read body error .", err)
+		return msg
+	}
+	err = json.Unmarshal(body, &msg)
+	if err != nil {
+		Utils.RuntimeLog().Info("json transfer error .", err)
+		return msg
+	}
+	return msg
 }
 
-// 获取负载均衡数据
-func (p *HttpInvoker) loadBalance() {
-	lb := DBModels.LoadBalance{}
-	err := lb.GetLoadBalanceByServiceName(p.ApiName)
-	if err != nil {
-		Utils.RuntimeLog().Info("get load balance info error .", err)
-	}
-	reg := DBModels.Registry{}
-	reg.Name = lb.RegistryName
-	err = reg.GetRegistry()
-	if err != nil {
-		Utils.RuntimeLog().Info("get registry info error .", err)
-	}
-	p.LBType = reg.RegistryType
-	p.Addr = reg.Addr
-	p.Strategy = lb.Strategy
-}
-
-// 获取注册中心数据
-func (p *HttpInvoker) discovery() {
-	p.loadBalance()
-	var servicesList []*registry.Service
-	switch p.LBType {
-
-	case Config.Consul:
-		servicesList = ConsulInitService(p.Addr, p.ApiName)
+func handleResponseReturn(res Domain.Message, returnType string, ginCtx *gin.Context) {
+	switch returnType {
+	case Config.Raw:
+		resBytes, _ := json.Marshal(res)
+		ginCtx.JSON(res.Code, string(resBytes))
 		break
-	case Config.Etcd:
-		servicesList = EtcdInitService(p.Addr, p.ApiName)
+	case Config.Yaml:
+		ginCtx.YAML(res.Code, res)
 		break
-	case Config.Zookeeper:
-		servicesList = ZookeeperInitService(p.Addr, p.ApiName)
+	case Config.Json:
+		ginCtx.JSON(res.Code, res)
 		break
-	case Config.Eureka:
-		servicesList = EurekaInitService(p.Addr, p.ApiName)
+	case Config.Xml:
+		ginCtx.XML(res.Code, res)
 		break
 	default:
-		servicesList = ConsulInitService(p.Addr, p.ApiName)
+		ginCtx.JSON(res.Code, res)
 	}
-	// 获取服务地址
-	serviceAddr := p.selectService(servicesList)
-	if serviceAddr == "" {
-		Utils.RuntimeLog().Info("can not fetch service address .")
-		return
-	}
-	p.host = serviceAddr
 }
