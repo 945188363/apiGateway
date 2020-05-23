@@ -1,4 +1,4 @@
-package Core
+package Domain
 
 type Message struct {
 	Code int

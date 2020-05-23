@@ -2,6 +2,7 @@ package Core
 
 import (
 	"apiGateway/Config"
+	"apiGateway/Core/Domain"
 	"apiGateway/DBModels"
 	"apiGateway/Utils"
 	"encoding/json"
@@ -36,7 +37,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 	// 先获取该服务在注册中心的集群数量 通过负载均衡选在一个server
 	p.discovery()
 	// 接收返回数据的chan，用在go程返回
-	doneChan := make(chan Message)
+	doneChan := make(chan Domain.Message)
 	// 使用模板调用相关服务
 	// MethodExecute(p,ginCtx,doneChan)
 
@@ -57,7 +58,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 				Utils.RuntimeLog().Info("read body error .", err)
 				return
 			}
-			var msg Message
+			var msg Domain.Message
 			err = json.Unmarshal(body, &msg)
 			if err != nil {
 				Utils.RuntimeLog().Info("json transfer error .", err)
@@ -87,7 +88,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 				Utils.RuntimeLog().Info("read body error .", err)
 				return
 			}
-			var msg Message
+			var msg Domain.Message
 			err = json.Unmarshal(body, &msg)
 			if err != nil {
 				Utils.RuntimeLog().Info("json transfer error .", err)
@@ -127,7 +128,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 }
 
 // 模板方法处理
-func MethodExecute(p *HttpInvoker, ginCtx *gin.Context, doneChan chan Message) {
+func MethodExecute(p *HttpInvoker, ginCtx *gin.Context, doneChan chan Domain.Message) {
 	// 获取到已经wrapper超时的上下文
 	ctx := ginCtx.Request.Context()
 	go func() {
@@ -162,7 +163,7 @@ func MethodExecute(p *HttpInvoker, ginCtx *gin.Context, doneChan chan Message) {
 			Utils.RuntimeLog().Info("read body error .", err)
 			return
 		}
-		var msg Message
+		var msg Domain.Message
 		err = json.Unmarshal(body, &msg)
 		if err != nil {
 			Utils.RuntimeLog().Info("json transfer error .", err)

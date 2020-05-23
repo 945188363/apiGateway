@@ -3,7 +3,7 @@ package Middlewares
 import (
 	"apiGateway/Constant/Code"
 	"apiGateway/Constant/Message"
-	"apiGateway/Core"
+	"apiGateway/Core/Domain"
 	"apiGateway/DBModels"
 	"apiGateway/Utils"
 	"github.com/gin-gonic/gin"
@@ -39,7 +39,7 @@ func (mw *IpRestrictionMw) GlobalIpRestrictionMiddleware() gin.HandlerFunc {
 		}
 		// 设置黑名单后，且在黑名单里，则阻止访问
 		if Utils.Contain(remoteIp, IpBlackList) && len(IpBlackList) > 0 {
-			c.JSON(http.StatusForbidden, Core.Message{
+			c.JSON(http.StatusForbidden, Domain.Message{
 				Code: Code.IP_FORBIDDEN,
 				Msg:  Message.IP_FORBIDDEN,
 				Data: nil,
@@ -73,7 +73,7 @@ func (mw *IpRestrictionMw) IpRestrictionMiddleware() gin.HandlerFunc {
 		}
 		// 设置黑名单后，且在黑名单里，则阻止访问
 		if Utils.Contain(remoteIp, IpBlackList) && len(IpBlackList) > 0 {
-			c.JSON(http.StatusForbidden, Core.Message{
+			c.JSON(http.StatusForbidden, Domain.Message{
 				Code: Code.IP_FORBIDDEN,
 				Msg:  Message.IP_FORBIDDEN,
 				Data: nil,

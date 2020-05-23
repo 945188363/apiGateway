@@ -3,7 +3,7 @@ package Middlewares
 import (
 	"apiGateway/Constant/Code"
 	"apiGateway/Constant/Message"
-	"apiGateway/Core"
+	"apiGateway/Core/Domain"
 	"apiGateway/DBModels"
 	"apiGateway/Utils"
 	"github.com/gin-gonic/gin"
@@ -58,7 +58,7 @@ func (mw *AuthMw) JWTAuthMiddleware() gin.HandlerFunc {
 		}
 
 		if code != Code.SUCCESS {
-			c.JSON(http.StatusUnauthorized, Core.Message{
+			c.JSON(http.StatusUnauthorized, Domain.Message{
 				Code: code,
 				Msg:  msg,
 				Data: nil,
