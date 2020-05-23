@@ -8,7 +8,7 @@ import (
 type IpRestriction struct {
 	Id           int    `gorm:"column:id;primary_key;AUTO_INCREMENT"`
 	Name         string `gorm:"column:name;type:varchar(50);not null;unique_index"`
-	Global       int    `gorm:"column:status;type:tinyint(1);not null;default:0"`
+	Global       int    `gorm:"column:global;type:tinyint(1);not null;default:0"`
 	Status       int    `gorm:"column:status;type:tinyint(1);not null;default:1"`
 	IpWhiteList  string `gorm:"column:ip_white_list;type:text"`
 	IpBlackList  string `gorm:"column:ip_black_list;type:text"`
@@ -18,11 +18,19 @@ type IpRestriction struct {
 
 // 设置User的表名为`Api`
 func (p *IpRestriction) TableName() string {
-	return "LogInfo"
+	return "IpRestriction"
 }
 
 func (p *IpRestriction) GetIpRestrictionByApi(api string) error {
 	if err := DB.DBConn().First(&p, "api_list like ? and global = ?", api, 0).Error; err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
+func (p *IpRestriction) GetIpRestrictionByApiGroup(apiGroup string) error {
+	if err := DB.DBConn().First(&p, "api_group LIKE ? and  global = ?", apiGroup, 0).Error; err != nil {
 		log.Fatal(err)
 		return err
 	}

@@ -3,6 +3,7 @@ package Middlewares
 import (
 	"apiGateway/Constant/Code"
 	"apiGateway/Constant/Message"
+	"apiGateway/Core"
 	"apiGateway/DBModels"
 	"apiGateway/Utils"
 	"github.com/gin-gonic/gin"
@@ -23,7 +24,6 @@ func (mw *AuthMw) JWTAuthMiddleware() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		var data interface{}
 		msg := Message.SUCCESS
 		code := Code.SUCCESS
 		token := c.Query("token")
@@ -58,12 +58,11 @@ func (mw *AuthMw) JWTAuthMiddleware() gin.HandlerFunc {
 		}
 
 		if code != Code.SUCCESS {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": code,
-				"msg":  msg,
-				"data": data,
+			c.JSON(http.StatusUnauthorized, Core.Message{
+				Code: code,
+				Msg:  msg,
+				Data: nil,
 			})
-
 			c.Abort()
 			return
 		}
