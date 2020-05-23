@@ -18,6 +18,9 @@ func InitApiMapping(router *gin.Engine) {
 	ratelimit := Middlewares.RateLimiterMw{}
 	// 熔断
 	breaker := Middlewares.BreakerMw{}
+	// 黑白名单
+	ipRestriction := Middlewares.IpRestrictionMw{}
+	router.Use(ipRestriction.GlobalIpRestrictionMiddleware())
 	api := DBModels.Api{}
 	apiList, err := api.GetApiList()
 	// 根据apiGroup分组

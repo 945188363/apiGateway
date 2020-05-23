@@ -1,6 +1,8 @@
 package Middlewares
 
 import (
+	"apiGateway/Constant/Code"
+	"apiGateway/Core/Domain"
 	"apiGateway/DBModels"
 	"context"
 	"errors"
@@ -26,7 +28,7 @@ func (mw *BreakerMw) CircuitBreakerMiddleware() gin.HandlerFunc {
 	hystrix.ConfigureCommand(cmdName, cmdConf)
 	return func(c *gin.Context) {
 		_ = hystrix.Do(cmdName, func() error {
-			ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(mw.ApiTimeout)*time.Millisecond)
+			ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(mw.ApiTimeout+100)*time.Millisecond)
 			var err error
 			// 检查是否超时
 			defer func() {
@@ -64,9 +66,10 @@ func breakerResponse(c *gin.Context, apiReturnContent string) {
 	if apiReturnContent != "" {
 		breakerMsg = apiReturnContent
 	}
-	breakerMsg = "ass"
-	c.JSON(http.StatusOK, gin.H{
-		"message": breakerMsg,
+	c.JSON(http.StatusOK, Domain.Message{
+		Code: Code.SUCCESS,
+		Msg:  breakerMsg,
+		Data: nil,
 	})
 	c.Abort()
 }

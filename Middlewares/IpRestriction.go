@@ -27,7 +27,7 @@ func (mw *IpRestrictionMw) GlobalIpRestrictionMiddleware() gin.HandlerFunc {
 		IpBlackList := strings.Split(globalIpRestriction.IpBlackList, ",")
 		IpWhiteList := strings.Split(globalIpRestriction.IpWhiteList, ",")
 
-		// 未设置黑名单直接放行
+		// 未设置黑白名单直接放行
 		if len(IpWhiteList) == 0 && len(IpBlackList) == 0 {
 			c.Next()
 			return
