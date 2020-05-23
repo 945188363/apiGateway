@@ -39,48 +39,6 @@ func InitApiMapping(router *gin.Engine) {
 			} else {
 				router.Any(handleUrl(apiListGroup[i][j]), breaker.CircuitBreakerMiddleware(), httpInvoker.Execute)
 			}
-			// if apiListGroup[i][j].ApiGroup != "" {
-			// 	group := router.Group("/" + apiListGroup[i][j].ApiGroup)
-			// 	{
-			// 		switch apiListGroup[i][j].ApiMethod {
-			// 		case "GET":
-			// 			group.GET(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 		case "POST":
-			// 			group.POST(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 		case "PUT":
-			// 			group.PUT(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 		case "PATCH":
-			// 			group.PATCH(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 		case "DELETE":
-			// 			group.DELETE(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 		case "OPTIONS":
-			// 			group.OPTIONS(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 		case "HEAD":
-			// 			group.HEAD(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 		default:
-			// 			group.GET(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 		}
-			// 	}
-			// } else {
-			// 	switch apiListGroup[i][j].ApiMethod {
-			// 	case "GET":
-			// 		router.GET(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 	case "POST":
-			// 		router.POST(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 	case "PUT":
-			// 		router.PUT(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 	case "PATCH":
-			// 		router.PATCH(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 	case "DELETE":
-			// 		router.DELETE(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 	case "OPTIONS":
-			// 		router.OPTIONS(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 	case "HEAD":
-			// 		router.HEAD(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 	default:
-			// 		router.GET(apiListGroup[i][j].ApiUrl, httpInvoker.execute)
-			// 	}
-			// }
 		}
 	}
 }
