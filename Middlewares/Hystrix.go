@@ -28,8 +28,8 @@ func (mw *BreakerMw) CircuitBreakerMiddleware() gin.HandlerFunc {
 		_ = hystrix.Do(cmdName, func() error {
 			ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(mw.ApiTimeout)*time.Millisecond)
 			var err error
+			// 检查是否超时
 			defer func() {
-				// 检查是否超时
 				if ctx.Err() == context.DeadlineExceeded {
 					// 返回信息并且终止请求
 					err = errors.New("timeout error")
@@ -40,10 +40,13 @@ func (mw *BreakerMw) CircuitBreakerMiddleware() gin.HandlerFunc {
 				// 完成后清空资源
 				cancel()
 			}()
-
 			// 包装上下文，增加Timeout限制
 			c.Request = c.Request.WithContext(ctx)
 			c.Next()
+			// 服务调用链是否调用成功
+			if err = c.Err(); err != nil {
+				return err
+			}
 			return err
 		}, func(err error) error {
 			// Utils.RuntimeLog().Info(err)
