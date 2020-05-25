@@ -6,5 +6,7 @@ const (
 
 	IP_FORBIDDEN = "your ip is in ipBlackList."
 
+	REQUEST_PARAM_ERROR = "your request has some bad parameters"
+
 	SUCCESS = "auth success"
 )

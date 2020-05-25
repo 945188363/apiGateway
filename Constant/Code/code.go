@@ -6,5 +6,7 @@ const (
 
 	IP_FORBIDDEN = 403
 
+	REQUEST_PARAM_ERROR = 402
+
 	SUCCESS = 203
 )
