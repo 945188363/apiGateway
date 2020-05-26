@@ -2,11 +2,19 @@ package Core
 
 import (
 	"apiGateway/Config"
+	"apiGateway/Constant/Code"
+	"apiGateway/Constant/Message"
 	"apiGateway/Core/Domain"
 	"apiGateway/DBModels"
 	"apiGateway/Utils"
+	"context"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/client"
+	"github.com/micro/go-micro/client/selector"
+	"github.com/micro/go-micro/registry"
+	"github.com/micro/go-plugins/registry/consul"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -25,6 +33,73 @@ type HttpInvoker struct {
 	Invoker
 }
 
+type RpcService interface {
+	InvokeMethod(ctx context.Context, in *Domain.RpcRequest, opts ...client.CallOption) (*Domain.RpcResponse, error)
+}
+
+type RpcInvoker struct {
+	DBModels.Api
+	c client.Client
+}
+
+func (c *RpcInvoker) InvokeMethod(ctx context.Context, in *Domain.RpcRequest, opts ...client.CallOption) (*Domain.RpcResponse, error) {
+	req := c.c.NewRequest(c.ApiName, "ProdService1.GetProdList", in)
+	out := new(Domain.RpcResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// gRpc协议的RPC调用
+func (p *RpcInvoker) Execute(ginCtx *gin.Context) {
+
+	doneChan := make(chan Domain.Message)
+	go func() {
+		// 获取consul注册地址
+		consulReg := consul.NewRegistry(
+			registry.Addrs("localhost:8500"),
+		)
+		// 负载均衡选择器
+		mySelector := selector.NewSelector(
+			selector.Registry(consulReg),
+			selector.SetStrategy(selector.Random),
+		)
+		// 创建客户端
+		serviceClient := micro.NewService(
+			micro.Name(p.ApiName+".Client"),
+			micro.Selector(mySelector),
+		)
+		p.c = serviceClient.Client()
+
+		req := Domain.NewRpcRequest()
+		req.Request["size"] = 2
+		resp, err := p.InvokeMethod(context.Background(), &req)
+		if err != nil {
+			Utils.RuntimeLog().Warn("Invoke Rpc Service error,error:", err.Error())
+			return
+		}
+		message := Domain.Message{
+			Code: Code.RPC_SUCCESS,
+			Msg:  Message.RPC_SUCCESS,
+			Data: resp.Response,
+		}
+		doneChan <- message
+	}()
+	// 获取到已经wrapper超时的上下文
+	ctx := ginCtx.Request.Context()
+	select {
+	// 如果上下文超时，或者被cancel则不返回数据
+	case <-ctx.Done():
+		return
+	// 如果调用完成则写数据
+	case res := <-doneChan:
+		handleResponseReturn(res, p.ApiReturnType, ginCtx)
+	}
+}
+
+// http协议的RPC调用
 func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 	// 先获取该服务在注册中心的集群数量 通过负载均衡选在一个server
 	p.discovery()

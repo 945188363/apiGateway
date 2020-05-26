@@ -8,5 +8,6 @@ const (
 
 	REQUEST_PARAM_ERROR = 402
 
-	SUCCESS = 203
+	SUCCESS     = 203
+	RPC_SUCCESS = 203
 )

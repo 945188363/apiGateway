@@ -9,4 +9,6 @@ const (
 	REQUEST_PARAM_ERROR = "your request has some bad parameters"
 
 	SUCCESS = "auth success"
+
+	RPC_SUCCESS = "rpc dial success"
 )

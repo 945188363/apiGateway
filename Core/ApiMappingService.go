@@ -14,13 +14,16 @@ func InitApiMapping(router *gin.Engine) {
 	// 鉴权
 	auth := Middlewares.AuthMw{}
 	router.Use(auth.BasicAuthMiddleware())
-	// 限流
-	ratelimit := Middlewares.RateLimiterMw{}
-	// 熔断
-	breaker := Middlewares.BreakerMw{}
 	// 黑白名单
 	ipRestriction := Middlewares.IpRestrictionMw{}
 	router.Use(ipRestriction.GlobalIpRestrictionMiddleware())
+	// 参数校验
+	paramCheck := Middlewares.ParameterCheckMw{}
+	router.Use(paramCheck.ParameterCheckMiddleware())
+	// 限流
+	rateLimit := Middlewares.RateLimiterMw{}
+	// 熔断
+	breaker := Middlewares.BreakerMw{}
 	api := DBModels.Api{}
 	apiList, err := api.GetApiList()
 	// 根据apiGroup分组
@@ -31,11 +34,11 @@ func InitApiMapping(router *gin.Engine) {
 	var httpInvoker HttpInvoker
 	for i := 0; i < len(apiListGroup); i++ {
 		for j := 0; j < len(apiListGroup[i]); j++ {
-			ratelimit.Api = apiListGroup[i][j]
+			rateLimit.Api = apiListGroup[i][j]
 			breaker.Api = apiListGroup[i][j]
 			httpInvoker.Api = apiListGroup[i][j]
-			if ratelimit.RateLimiterNum > 0 {
-				router.Any(handleUrl(apiListGroup[i][j]), ratelimit.RateLimitMiddleware(), breaker.CircuitBreakerMiddleware(), httpInvoker.Execute)
+			if rateLimit.RateLimiterNum > 0 {
+				router.Any(handleUrl(apiListGroup[i][j]), rateLimit.RateLimitMiddleware(), breaker.CircuitBreakerMiddleware(), httpInvoker.Execute)
 			} else {
 				router.Any(handleUrl(apiListGroup[i][j]), breaker.CircuitBreakerMiddleware(), httpInvoker.Execute)
 			}
