@@ -43,7 +43,7 @@ type RpcInvoker struct {
 }
 
 func (c *RpcInvoker) InvokeMethod(ctx context.Context, in *Domain.RpcRequest, opts ...client.CallOption) (*Domain.RpcResponse, error) {
-	req := c.c.NewRequest(c.ApiName, "ProdService1.GetProdList", in)
+	req := c.c.NewRequest(c.ApiName, c.ApiName+"."+c.BackendUrl, in)
 	out := new(Domain.RpcResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {

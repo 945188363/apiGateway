@@ -7,4 +7,7 @@ const (
 	Json = "JSON"
 	Xml  = "XML"
 	Yaml = "YAML"
+
+	Http = "http"
+	GRPC = "gRPC"
 )
