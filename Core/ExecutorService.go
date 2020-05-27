@@ -9,6 +9,7 @@ import (
 	"apiGateway/Utils"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/client"
@@ -56,7 +57,7 @@ func (c *RpcInvoker) InvokeMethod(ctx context.Context, in *Domain.RpcRequest, op
 func (p *RpcInvoker) Execute(ginCtx *gin.Context) {
 
 	doneChan := make(chan Domain.Message)
-	go func() {
+	go func(ctx context.Context) {
 		// 获取consul注册地址
 		consulReg := consul.NewRegistry(
 			registry.Addrs("localhost:8500"),
@@ -75,9 +76,10 @@ func (p *RpcInvoker) Execute(ginCtx *gin.Context) {
 
 		req := Domain.NewRpcRequest()
 		req.Request["size"] = 2
-		resp, err := p.InvokeMethod(context.Background(), &req)
+		resp, err := p.InvokeMethod(ctx, &req)
 		if err != nil {
-			Utils.RuntimeLog().Warn("Invoke Rpc Service error,error:", err.Error())
+			fmt.Println(err.Error())
+			// Utils.RuntimeLog().Warn("Invoke Rpc Service error,error:", err.Error())
 			return
 		}
 		message := Domain.Message{
@@ -86,7 +88,7 @@ func (p *RpcInvoker) Execute(ginCtx *gin.Context) {
 			Data: resp.Response,
 		}
 		doneChan <- message
-	}()
+	}(context.Background())
 	// 获取到已经wrapper超时的上下文
 	ctx := ginCtx.Request.Context()
 	select {
@@ -113,7 +115,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 	// 使用httpClient调用相关服务
 	switch p.ApiMethod {
 	case Config.Post:
-		go func() {
+		go func(ctx context.Context) {
 			resp, err := http.PostForm(handleProtocol(p.ProtocolType, p.host, p.BackendUrl), ginCtx.Request.Form)
 			if err != nil {
 				Utils.RuntimeLog().Info("do Get request error .", err)
@@ -132,7 +134,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 				return
 			}
 			doneChan <- msg
-		}()
+		}(ctx)
 		// 监听通道是否超时或者完成
 		select {
 		// 如果上下文超时，或者被cancel则不返回数据
@@ -143,7 +145,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 			handleResponseReturn(res, p.ApiReturnType, ginCtx)
 		}
 	case Config.Get:
-		go func() {
+		go func(ctx context.Context) {
 			resp, err := http.Get(handleProtocol(p.ProtocolType, p.host, p.BackendUrl))
 			if err != nil {
 				Utils.RuntimeLog().Info("do Get request error .", err)
@@ -162,7 +164,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 				return
 			}
 			doneChan <- msg
-		}()
+		}(ctx)
 		// 监听通道是否超时或者完成
 		select {
 		// 如果上下文超时，或者被cancel则不返回数据
@@ -198,7 +200,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 func MethodExecute(p *HttpInvoker, ginCtx *gin.Context, doneChan chan Domain.Message) {
 	// 获取到已经wrapper超时的上下文
 	ctx := ginCtx.Request.Context()
-	go func() {
+	go func(ctx context.Context) {
 		var err error
 		var resp *http.Response
 		switch p.ApiMethod {
@@ -226,7 +228,7 @@ func MethodExecute(p *HttpInvoker, ginCtx *gin.Context, doneChan chan Domain.Mes
 		}
 		msg := handlePreResponse(resp)
 		doneChan <- msg
-	}()
+	}(ctx)
 	// 监听通道是否超时或者完成
 	select {
 	// 如果上下文超时，或者被cancel则不返回数据
