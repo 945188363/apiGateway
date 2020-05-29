@@ -1,4 +1,4 @@
-package Utils
+package ComponentUtil
 
 import (
 	"bytes"

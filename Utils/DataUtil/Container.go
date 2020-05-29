@@ -1,4 +1,4 @@
-package Utils
+package DataUtil
 
 import (
 	"apiGateway/Core/Domain"

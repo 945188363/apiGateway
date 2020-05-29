@@ -1,7 +1,7 @@
 package Core
 
 import (
-	"apiGateway/Utils"
+	"apiGateway/Utils/ComponentUtil"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-plugins/registry/consul"
 	"github.com/micro/go-plugins/registry/etcd"
@@ -40,7 +40,7 @@ func ZookeeperInitService(addr string, apiName string) []*registry.Service {
 func serviceInit(reg registry.Registry, apiName string) []*registry.Service {
 	servicesList, err := reg.GetService(apiName)
 	if err != nil {
-		Utils.RuntimeLog().Info("init registry center error .", err)
+		ComponentUtil.RuntimeLog().Info("init registry center error .", err)
 		return nil
 	}
 	return servicesList

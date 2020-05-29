@@ -2,7 +2,7 @@ package Handlers
 
 import (
 	"apiGateway/DBModels"
-	"apiGateway/Utils"
+	"apiGateway/Utils/DataUtil"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"reflect"
@@ -69,7 +69,7 @@ func SaveLogInfo(ginCtx *gin.Context) {
 	var logInfo LogInfo
 	ginCtx.Bind(&logInfo)
 	var logInfoModel DBModels.LogInfo
-	Utils.CopyFields(&logInfoModel, logInfo,
+	DataUtil.CopyFields(&logInfoModel, logInfo,
 		"LogType",
 		"LogName",
 		"LogRecordStatus",

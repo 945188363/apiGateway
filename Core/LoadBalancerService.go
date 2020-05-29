@@ -3,7 +3,7 @@ package Core
 import (
 	"apiGateway/Config"
 	"apiGateway/DBModels"
-	"apiGateway/Utils"
+	"apiGateway/Utils/ComponentUtil"
 	"github.com/micro/go-micro/registry"
 )
 
@@ -28,13 +28,13 @@ func (p *Invoker) loadBalance() {
 	lb := DBModels.LoadBalance{}
 	err := lb.GetLoadBalanceByServiceName(p.ApiName)
 	if err != nil {
-		Utils.RuntimeLog().Info("get load balance info error .", err)
+		ComponentUtil.RuntimeLog().Info("get load balance info error .", err)
 	}
 	reg := DBModels.Registry{}
 	reg.Name = lb.RegistryName
 	err = reg.GetRegistry()
 	if err != nil {
-		Utils.RuntimeLog().Info("get registry info error .", err)
+		ComponentUtil.RuntimeLog().Info("get registry info error .", err)
 	}
 	p.LBType = reg.RegistryType
 	p.Addr = reg.Addr
@@ -65,7 +65,7 @@ func (p *Invoker) discovery() {
 	// 获取服务地址
 	serviceAddr := p.selectService(servicesList)
 	if serviceAddr == "" {
-		Utils.RuntimeLog().Info("can not fetch service address .")
+		ComponentUtil.RuntimeLog().Info("can not fetch service address .")
 		return
 	}
 	p.host = serviceAddr

@@ -8,7 +8,7 @@ import (
 
 var (
 	pool      *redis.Pool
-	redisHost = "localhost:30379"
+	redisHost = "localhost:6379"
 	redisPass = "123456"
 )
 

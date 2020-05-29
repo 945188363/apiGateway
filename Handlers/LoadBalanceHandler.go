@@ -2,7 +2,7 @@ package Handlers
 
 import (
 	"apiGateway/DBModels"
-	"apiGateway/Utils"
+	"apiGateway/Utils/DataUtil"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"reflect"
@@ -43,7 +43,7 @@ func SaveLoadBalance(ginCtx *gin.Context) {
 	var registry Registry
 	ginCtx.Bind(&registry)
 	var registryModel DBModels.Registry
-	Utils.CopyFields(&registryModel, registry,
+	DataUtil.CopyFields(&registryModel, registry,
 		"Name",
 		"RegistryName",
 		"Strategy",
@@ -64,7 +64,7 @@ func DeleteLoadBalance(ginCtx *gin.Context) {
 	var loadBalance LoadBalance
 	ginCtx.Bind(&loadBalance)
 	var loadBalanceModel DBModels.LoadBalance
-	Utils.CopyFields(&loadBalanceModel, loadBalance,
+	DataUtil.CopyFields(&loadBalanceModel, loadBalance,
 		"Name",
 		"RegistryName",
 		"Strategy",

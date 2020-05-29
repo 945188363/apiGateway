@@ -5,7 +5,7 @@ import (
 	"apiGateway/Constant/Message"
 	"apiGateway/Core/Domain"
 	"apiGateway/DBModels"
-	"apiGateway/Utils"
+	"apiGateway/Utils/ComponentUtil"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
@@ -51,7 +51,7 @@ func checkParams(values url.Values, c *gin.Context) {
 		expr := "^[a-z,A-Z]"
 		matched, err := regexp.Match(expr, []byte(k))
 		if err != nil {
-			Utils.RuntimeLog().Warn("regexp match request parameter error :" + err.Error())
+			ComponentUtil.RuntimeLog().Warn("regexp match request parameter error :" + err.Error())
 			return
 		}
 		if !matched {

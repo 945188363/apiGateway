@@ -4,7 +4,7 @@ import (
 	"apiGateway/Config"
 	"apiGateway/DBModels"
 	"apiGateway/Middlewares"
-	"apiGateway/Utils"
+	"apiGateway/Utils/ComponentUtil"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"sort"
@@ -29,7 +29,7 @@ func InitApiMapping(router *gin.Engine) {
 	apiList, err := api.GetApiList()
 	// 根据apiGroup分组
 	if err != nil {
-		Utils.RuntimeLog().Info("get api list error", err)
+		ComponentUtil.RuntimeLog().Info("get api list error", err)
 	}
 	apiListGroup := splitByGroup(apiList)
 	var httpInvoker HttpInvoker

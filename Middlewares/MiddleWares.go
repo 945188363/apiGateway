@@ -3,7 +3,7 @@ package Middlewares
 import (
 	"apiGateway/Config"
 	"apiGateway/DBModels"
-	"apiGateway/Utils"
+	"apiGateway/Utils/ComponentUtil"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -52,7 +52,7 @@ func LoggerMiddleware() gin.HandlerFunc {
 			c.Next()
 			return
 		}
-		logger := Utils.AccessLog(&accessLogInfo)
+		logger := ComponentUtil.AccessLog(&accessLogInfo)
 		// 开始时间
 		startTime := time.Now()
 		// 处理请求
@@ -94,7 +94,7 @@ func Recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				Utils.RuntimeLog().Errorf("unknown panic: [%s], stacktrace: [%s]", err, debug.Stack())
+				ComponentUtil.RuntimeLog().Errorf("unknown panic: [%s], stacktrace: [%s]", err, debug.Stack())
 			}
 		}()
 		c.Next()

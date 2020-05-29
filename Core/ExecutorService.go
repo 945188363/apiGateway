@@ -5,7 +5,8 @@ import (
 	"apiGateway/Core/Domain"
 	"apiGateway/Core/rpcService"
 	"apiGateway/DBModels"
-	"apiGateway/Utils"
+	"apiGateway/Utils/ComponentUtil"
+	"apiGateway/Utils/DataUtil"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -94,7 +95,7 @@ func (p *RpcInvoker) Execute(ginCtx *gin.Context) {
 		paramMap["Size"] = 22
 		req := rpcService.RpcRequest{
 			// Request:Utils.MessageToBytes(reqMessage),
-			Request: Utils.IntToBytes(8),
+			Request: DataUtil.IntToBytes(8),
 			// Request:Utils.MapToBytes(paramMap),
 		}
 
@@ -115,7 +116,7 @@ func (p *RpcInvoker) Execute(ginCtx *gin.Context) {
 		}
 		var msg Domain.Message
 		msg.Data = make(map[string]interface{})
-		msg.Data["Num"] = Utils.BytesToInt(resp.Response)
+		msg.Data["Num"] = DataUtil.BytesToInt(resp.Response)
 		doneChan <- msg
 	}(context.Background())
 
@@ -169,19 +170,19 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 		go func(ctx context.Context) {
 			resp, err := http.PostForm(handleProtocol(p.ProtocolType, p.host, p.BackendUrl), ginCtx.Request.Form)
 			if err != nil {
-				Utils.RuntimeLog().Info("do Get request error .", err)
+				ComponentUtil.RuntimeLog().Info("do Get request error .", err)
 				return
 			}
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
-				Utils.RuntimeLog().Info("read body error .", err)
+				ComponentUtil.RuntimeLog().Info("read body error .", err)
 				return
 			}
 			var msg Domain.Message
 			err = json.Unmarshal(body, &msg)
 			if err != nil {
-				Utils.RuntimeLog().Info("json transfer error .", err)
+				ComponentUtil.RuntimeLog().Info("json transfer error .", err)
 				return
 			}
 			doneChan <- msg
@@ -199,19 +200,19 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 		go func(ctx context.Context) {
 			resp, err := http.Get(handleProtocol(p.ProtocolType, p.host, p.BackendUrl))
 			if err != nil {
-				Utils.RuntimeLog().Info("do Get request error .", err)
+				ComponentUtil.RuntimeLog().Info("do Get request error .", err)
 				return
 			}
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
-				Utils.RuntimeLog().Info("read body error .", err)
+				ComponentUtil.RuntimeLog().Info("read body error .", err)
 				return
 			}
 			var msg Domain.Message
 			err = json.Unmarshal(body, &msg)
 			if err != nil {
-				Utils.RuntimeLog().Info("json transfer error .", err)
+				ComponentUtil.RuntimeLog().Info("json transfer error .", err)
 				return
 			}
 			doneChan <- msg
@@ -231,7 +232,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 		}
 		req, err := http.NewRequest(p.ApiMethod, handleProtocol(p.ProtocolType, p.host, p.BackendUrl), ginCtx.Request.Body)
 		if err != nil {
-			Utils.RuntimeLog().Info("send request error .", err)
+			ComponentUtil.RuntimeLog().Info("send request error .", err)
 			return
 		}
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -240,7 +241,7 @@ func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			Utils.RuntimeLog().Info("read body error .", err)
+			ComponentUtil.RuntimeLog().Info("read body error .", err)
 			return
 		}
 		ginCtx.JSON(http.StatusAccepted, string(body))
@@ -267,14 +268,14 @@ func MethodExecute(p *HttpInvoker, ginCtx *gin.Context, doneChan chan Domain.Mes
 			}
 			req, err := http.NewRequest(p.ApiMethod, handleProtocol(p.ProtocolType, p.host, p.BackendUrl), ginCtx.Request.Body)
 			if err != nil {
-				Utils.RuntimeLog().Info("send request error .", err)
+				ComponentUtil.RuntimeLog().Info("send request error .", err)
 				return
 			}
 			resp, err = client.Do(req)
 		}
 		// 错误处理
 		if err != nil {
-			Utils.RuntimeLog().Info("send request error .", err)
+			ComponentUtil.RuntimeLog().Info("send request error .", err)
 			return
 		}
 		msg := handlePreResponse(resp)
@@ -307,12 +308,12 @@ func handlePreResponse(resp *http.Response) Domain.Message {
 	var msg Domain.Message
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		Utils.RuntimeLog().Info("read body error .", err)
+		ComponentUtil.RuntimeLog().Info("read body error .", err)
 		return msg
 	}
 	err = json.Unmarshal(body, &msg)
 	if err != nil {
-		Utils.RuntimeLog().Info("json transfer error .", err)
+		ComponentUtil.RuntimeLog().Info("json transfer error .", err)
 		return msg
 	}
 	return msg

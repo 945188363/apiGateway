@@ -1,4 +1,4 @@
-package Utils
+package DataUtil
 
 func Validate(pattern string, values ...interface{}) bool {
 	switch pattern {

@@ -2,7 +2,7 @@ package Handlers
 
 import (
 	"apiGateway/DBModels"
-	"apiGateway/Utils"
+	"apiGateway/Utils/DataUtil"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"reflect"
@@ -47,7 +47,7 @@ func SaveApiGroup(ginCtx *gin.Context) {
 	var apiGroup ApiGroup
 	ginCtx.Bind(&apiGroup)
 	var apiGroupModel DBModels.ApiGroup
-	Utils.CopyFields(&apiGroupModel, apiGroup,
+	DataUtil.CopyFields(&apiGroupModel, apiGroup,
 		"ApiGroupName",
 		"Description")
 	saveApiGroup := apiGroupModel.SaveApiGroup()
@@ -66,7 +66,7 @@ func DeleteApiGroup(ginCtx *gin.Context) {
 	var apiGroup ApiGroup
 	ginCtx.Bind(&apiGroup)
 	var apiGroupModel DBModels.ApiGroup
-	Utils.CopyFields(&apiGroupModel, apiGroup,
+	DataUtil.CopyFields(&apiGroupModel, apiGroup,
 		"ApiGroupName",
 		"Description")
 	delApiGroup := apiGroupModel.DeleteApiGroup()

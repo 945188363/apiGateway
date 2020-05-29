@@ -2,7 +2,7 @@ package Handlers
 
 import (
 	"apiGateway/DBModels"
-	"apiGateway/Utils"
+	"apiGateway/Utils/DataUtil"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"reflect"
@@ -42,7 +42,7 @@ func SaveRegistry(ginCtx *gin.Context) {
 	var registry Registry
 	ginCtx.Bind(&registry)
 	var registryModel DBModels.Registry
-	Utils.CopyFields(&registryModel, registry,
+	DataUtil.CopyFields(&registryModel, registry,
 		"Name",
 		"RegistryType",
 		"Addr")
@@ -62,7 +62,7 @@ func DeleteRegistry(ginCtx *gin.Context) {
 	var registry Registry
 	ginCtx.Bind(&registry)
 	var registryModel DBModels.Registry
-	Utils.CopyFields(&registryModel, registry,
+	DataUtil.CopyFields(&registryModel, registry,
 		"Name",
 		"RegistryType",
 		"Addr")

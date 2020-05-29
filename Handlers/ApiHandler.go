@@ -2,7 +2,7 @@ package Handlers
 
 import (
 	"apiGateway/DBModels"
-	"apiGateway/Utils"
+	"apiGateway/Utils/DataUtil"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -85,7 +85,7 @@ func SaveApi(ginCtx *gin.Context) {
 	ginCtx.Bind(&api)
 	fmt.Println(api)
 	var apiModel DBModels.Api
-	Utils.CopyFields(&apiModel, api)
+	DataUtil.CopyFields(&apiModel, api)
 	fmt.Println(apiModel)
 
 	saveApi := apiModel.SaveApi()
@@ -104,7 +104,7 @@ func DeleteApi(ginCtx *gin.Context) {
 	var api Api
 	ginCtx.Bind(&api)
 	var apiModel DBModels.Api
-	Utils.CopyFields(&apiModel, api)
+	DataUtil.CopyFields(&apiModel, api)
 	delApi := apiModel.DeleteApi()
 	if delApi {
 		ginCtx.JSON(200, gin.H{

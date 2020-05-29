@@ -6,6 +6,7 @@ import (
 	"apiGateway/Core/Domain"
 	"apiGateway/DBModels"
 	"apiGateway/Utils"
+	"apiGateway/Utils/DataUtil"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -33,12 +34,12 @@ func (mw *IpRestrictionMw) GlobalIpRestrictionMiddleware() gin.HandlerFunc {
 			return
 		}
 		// 设置白名单后，且在白名单里，请求放行
-		if Utils.Contain(remoteIp, IpWhiteList) && len(IpWhiteList) > 0 {
+		if DataUtil.Contain(remoteIp, IpWhiteList) && len(IpWhiteList) > 0 {
 			c.Next()
 			return
 		}
 		// 设置黑名单后，且在黑名单里，则阻止访问
-		if Utils.Contain(remoteIp, IpBlackList) && len(IpBlackList) > 0 {
+		if DataUtil.Contain(remoteIp, IpBlackList) && len(IpBlackList) > 0 {
 			c.JSON(http.StatusForbidden, Domain.Message{
 				Code: Code.IP_FORBIDDEN,
 				Msg:  Message.IP_FORBIDDEN,
@@ -67,12 +68,12 @@ func (mw *IpRestrictionMw) IpRestrictionMiddleware() gin.HandlerFunc {
 			return
 		}
 		// 设置白名单后，且在白名单里，请求放行
-		if Utils.Contain(remoteIp, IpWhiteList) && len(IpWhiteList) > 0 {
+		if DataUtil.Contain(remoteIp, IpWhiteList) && len(IpWhiteList) > 0 {
 			c.Next()
 			return
 		}
 		// 设置黑名单后，且在黑名单里，则阻止访问
-		if Utils.Contain(remoteIp, IpBlackList) && len(IpBlackList) > 0 {
+		if DataUtil.Contain(remoteIp, IpBlackList) && len(IpBlackList) > 0 {
 			c.JSON(http.StatusForbidden, Domain.Message{
 				Code: Code.IP_FORBIDDEN,
 				Msg:  Message.IP_FORBIDDEN,
