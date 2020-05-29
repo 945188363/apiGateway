@@ -20,7 +20,7 @@ func (mw *BreakerMw) CircuitBreakerMiddleware() gin.HandlerFunc {
 	cmdName := mw.ApiName + mw.ApiUrl
 	cmdConf := hystrix.CommandConfig{
 		Timeout:                mw.ApiTimeout,
-		MaxConcurrentRequests:  mw.RateLimiterNum,
+		MaxConcurrentRequests:  mw.RateLimitNum,
 		RequestVolumeThreshold: 5,
 		ErrorPercentThreshold:  20,
 		SleepWindow:            10000,

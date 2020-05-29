@@ -12,7 +12,7 @@ type RateLimiterMw struct {
 
 // 限流中间件
 func (mw *RateLimiterMw) RateLimitMiddleware() gin.HandlerFunc {
-	lmt := tollbooth.NewLimiter(float64(mw.RateLimiterNum), nil)
+	lmt := tollbooth.NewLimiter(float64(mw.RateLimitNum), nil)
 	lmt.SetMessage("error,request too many times,you are limited")
 	return func(c *gin.Context) {
 		httpError := tollbooth.LimitByRequest(lmt, c.Writer, c.Request)

@@ -12,8 +12,10 @@ import (
 type Api struct {
 	ApiName          string `form:"ApiName"`
 	ApiUrl           string `form:"ApiUrl"`
+	ProtocolType     string `form:"ProtocolType"`
 	BackendUrl       string `form:"BackendUrl"`
 	ApiMethod        string `form:"ApiMethod"`
+	RateLimitNum     int    `form:"RateLimitNum"`
 	ApiTimeout       int    `form:"ApiTimeout"`
 	ApiRetry         int    `form:"ApiRetry"`
 	ApiReturnType    string `form:"ApiReturnType"`
