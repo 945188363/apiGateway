@@ -40,14 +40,14 @@ func InitApiMapping(router *gin.Engine) {
 			breaker.Api = apiListGroup[i][j]
 			if apiListGroup[i][j].ProtocolType == Config.Http {
 				httpInvoker.Api = apiListGroup[i][j]
-				if rateLimit.RateLimiterNum > 0 {
+				if rateLimit.RateLimitNum > 0 {
 					router.Any(handleUrl(apiListGroup[i][j]), rateLimit.RateLimitMiddleware(), breaker.CircuitBreakerMiddleware(), httpInvoker.Execute)
 				} else {
 					router.Any(handleUrl(apiListGroup[i][j]), breaker.CircuitBreakerMiddleware(), httpInvoker.Execute)
 				}
 			} else if apiListGroup[i][j].ProtocolType == Config.GRPC {
 				rpcInvoker.Api = apiListGroup[i][j]
-				if rateLimit.RateLimiterNum > 0 {
+				if rateLimit.RateLimitNum > 0 {
 					router.Any(handleUrl(apiListGroup[i][j]), rateLimit.RateLimitMiddleware(), breaker.CircuitBreakerMiddleware(), rpcInvoker.Execute)
 				} else {
 					router.Any(handleUrl(apiListGroup[i][j]), breaker.CircuitBreakerMiddleware(), rpcInvoker.Execute)
