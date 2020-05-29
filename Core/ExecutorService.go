@@ -2,9 +2,8 @@ package Core
 
 import (
 	"apiGateway/Config"
-	"apiGateway/Constant/Code"
-	"apiGateway/Constant/Message"
 	"apiGateway/Core/Domain"
+	"apiGateway/Core/rpcService"
 	"apiGateway/DBModels"
 	"apiGateway/Utils"
 	"context"
@@ -36,6 +35,7 @@ type HttpInvoker struct {
 
 type RpcService interface {
 	InvokeMethod(ctx context.Context, in *Domain.RpcRequest, opts ...client.CallOption) (*Domain.RpcResponse, error)
+	InvokeMethod2(ctx context.Context, in *rpcService.RpcRequest, opts ...client.CallOption) (*rpcService.RpcResponse, error)
 }
 
 type RpcInvoker struct {
@@ -44,8 +44,18 @@ type RpcInvoker struct {
 }
 
 func (c *RpcInvoker) InvokeMethod(ctx context.Context, in *Domain.RpcRequest, opts ...client.CallOption) (*Domain.RpcResponse, error) {
-	req := c.c.NewRequest(c.ApiName, c.ApiName+"."+c.BackendUrl, in)
+	req := c.c.NewRequest(c.ApiName, c.BackendUrl, in)
 	out := new(Domain.RpcResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *RpcInvoker) InvokeMethod2(ctx context.Context, in *rpcService.RpcRequest, opts ...client.CallOption) (*rpcService.RpcResponse, error) {
+	req := c.c.NewRequest(c.ApiName, c.BackendUrl, in)
+	out := new(rpcService.RpcResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -72,23 +82,43 @@ func (p *RpcInvoker) Execute(ginCtx *gin.Context) {
 			micro.Name(p.ApiName+".Client"),
 			micro.Selector(mySelector),
 		)
-		p.c = serviceClient.Client()
+		rpcServ := NewRpcService(p.Api, serviceClient.Client())
+		// p.c = serviceClient.Client()
 
-		req := Domain.NewRpcRequest()
-		req.Request["size"] = 2
-		resp, err := p.InvokeMethod(ctx, &req)
+		// req := Domain.NewRpcRequest()
+		// req.Request["size"] = 2
+		// reqMessage := Domain.Message{}
+		// reqMessage.Data = make(map[string]interface{})
+		// reqMessage.Data["Size"] = 8
+		paramMap := make(map[string]interface{})
+		paramMap["Size"] = 22
+		req := rpcService.RpcRequest{
+			// Request:Utils.MessageToBytes(reqMessage),
+			Request: Utils.IntToBytes(8),
+			// Request:Utils.MapToBytes(paramMap),
+		}
+
+		// 通过包装callOptions来设置重试、超时等
+		// resp, err := rpcServ.InvokeMethod(ctx, &req,
+		// 	client.WithDialTimeout(time.Duration(30000) * time.Millisecond),
+		// 	client.WithRequestTimeout(time.Duration(30000) * time.Millisecond),
+		resp, err := rpcServ.InvokeMethod2(ctx, &req,
+			client.WithDialTimeout(time.Duration(30000)*time.Millisecond),
+			client.WithRequestTimeout(time.Duration(30000)*time.Millisecond),
+		)
+		// resp, err := rpcServ.InvokeMethod(ctx, &req)
+		// resp, err := p.InvokeMethod(ctx, &req)
 		if err != nil {
 			fmt.Println(err.Error())
 			// Utils.RuntimeLog().Warn("Invoke Rpc Service error,error:", err.Error())
 			return
 		}
-		message := Domain.Message{
-			Code: Code.RPC_SUCCESS,
-			Msg:  Message.RPC_SUCCESS,
-			Data: resp.Response,
-		}
-		doneChan <- message
+		var msg Domain.Message
+		msg.Data = make(map[string]interface{})
+		msg.Data["Num"] = Utils.BytesToInt(resp.Response)
+		doneChan <- msg
 	}(context.Background())
+
 	// 获取到已经wrapper超时的上下文
 	ctx := ginCtx.Request.Context()
 	select {
@@ -98,6 +128,27 @@ func (p *RpcInvoker) Execute(ginCtx *gin.Context) {
 	// 如果调用完成则写数据
 	case res := <-doneChan:
 		handleResponseReturn(res, p.ApiReturnType, ginCtx)
+	}
+}
+
+func NewRpcService(api DBModels.Api, c client.Client) RpcService {
+	if c == nil {
+		c = client.NewClient()
+	}
+	// 客户端重试和超时时间
+	// _ = c.Init(
+	// 	client.Retries(api.ApiRetry),
+	// 	client.DialTimeout(6*time.Second),
+	// 	client.RequestTimeout(6*time.Second),
+	// 	client.Retry(func(ctx context.Context, req client.Request, retryCount int, err error) (bool, error) {
+	// 		// Utils.RuntimeLog().Warn(req.Method(), retryCount, " client retry")
+	// 		fmt.Println(req.Method(), retryCount, " client retry")
+	// 		return true, nil
+	// 	}),
+	// )
+	return &RpcInvoker{
+		Api: api,
+		c:   c,
 	}
 }
 
@@ -245,7 +296,9 @@ func handleProtocol(protocolType, host, uri string) string {
 	var addr string
 
 	// 处理协议
-	addr = protocolType + "://" + host + uri
+	if protocolType == Config.Http {
+		addr = protocolType + "://" + host + uri
+	}
 	return addr
 }
 
@@ -268,8 +321,8 @@ func handlePreResponse(resp *http.Response) Domain.Message {
 func handleResponseReturn(res Domain.Message, returnType string, ginCtx *gin.Context) {
 	switch returnType {
 	case Config.Raw:
-		resBytes, _ := json.Marshal(res)
-		ginCtx.JSON(res.Code, string(resBytes))
+		rawBytes, _ := json.Marshal(res)
+		ginCtx.JSON(res.Code, string(rawBytes))
 		break
 	case Config.Yaml:
 		ginCtx.YAML(res.Code, res)

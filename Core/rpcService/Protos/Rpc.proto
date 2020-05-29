@@ -1,0 +1,15 @@
+syntax = "proto3";
+package Protos;
+option go_package = ".;Service";
+
+message RpcRequest {
+    bytes Request = 1;
+}
+
+message RpcResponse {
+    bytes Response = 1;
+}
+
+service RpcService {
+    rpc GetProdListRpc (RpcRequest) returns (RpcResponse);
+}

@@ -1,7 +1,7 @@
 package DBModels
 
 import (
-	"apiGateway/DB"
+	"apiGateway/Common/DB"
 )
 
 type Auth struct {
