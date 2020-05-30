@@ -49,10 +49,12 @@ func (p *Api) SaveApi() bool {
 	if exist.Id != 0 {
 		updateApi := Api{
 			ApiName:          p.ApiName,
+			ProtocolType:     p.ProtocolType,
 			ApiUrl:           p.ApiUrl,
 			BackendUrl:       p.BackendUrl,
 			ApiMethod:        p.ApiMethod,
 			ApiTimeout:       p.ApiTimeout,
+			RateLimitNum:     p.RateLimitNum,
 			ApiRetry:         p.ApiRetry,
 			ApiReturnType:    p.ApiReturnType,
 			ApiReturnContent: p.ApiReturnContent,
