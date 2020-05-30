@@ -27,6 +27,17 @@ func NewGinRouter() *gin.Engine {
 		gateway.GET("/queryApiGroupList", Handlers.GetApiGroupList)
 		gateway.POST("/updateApiGroupDetail", Handlers.SaveApiGroup)
 		gateway.POST("/deleteApiGroupDetail", Handlers.DeleteApiGroup)
+		// registry 相关路由
+		gateway.POST("/createRegistry", Handlers.SaveRegistry)
+		gateway.GET("/queryRegistry", Handlers.GetRegistryList)
+		gateway.POST("/updateRegistry", Handlers.SaveRegistry)
+		gateway.POST("/deleteRegistry", Handlers.DeleteRegistry)
+		// loadBalance相关路由
+		gateway.POST("/createLoadBalance", Handlers.SaveLoadBalance)
+		gateway.GET("/queryLoadBalance", Handlers.GetLoadBalanceList)
+		gateway.POST("/updateLoadBalance", Handlers.SaveLoadBalance)
+		gateway.POST("/deleteLoadBalance", Handlers.DeleteLoadBalance)
+
 	}
 	ginRouter.POST("/users", Handlers.GetUser)
 	Core.InitApiMapping(ginRouter)

@@ -27,8 +27,8 @@ func (p *Registry) GetRegistry() error {
 
 func (p *Registry) SaveRegistry() bool {
 	// 已存在更新，否则创建
-	exist := LogInfo{}
-	DB.DBConn().First(&exist, p)
+	exist := Registry{}
+	DB.DBConn().First(&exist, "name = ?", p.Name)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
 			log.Fatal(err)

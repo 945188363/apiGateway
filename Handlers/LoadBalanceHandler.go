@@ -40,15 +40,15 @@ func GetLoadBalanceList(ginCtx *gin.Context) {
 }
 
 func SaveLoadBalance(ginCtx *gin.Context) {
-	var registry Registry
-	ginCtx.Bind(&registry)
-	var registryModel DBModels.Registry
-	DataUtil.CopyFields(&registryModel, registry,
+	var loadBalance LoadBalance
+	ginCtx.Bind(&loadBalance)
+	var loadBalanceModel DBModels.LoadBalance
+	DataUtil.CopyFields(&loadBalanceModel, loadBalance,
 		"Name",
 		"RegistryName",
 		"Strategy",
 		"ServiceName")
-	saveRegistry := registryModel.SaveRegistry()
+	saveRegistry := loadBalanceModel.SaveLoadBalance()
 	if saveRegistry {
 		ginCtx.JSON(200, gin.H{
 			"message": "save registry success",
