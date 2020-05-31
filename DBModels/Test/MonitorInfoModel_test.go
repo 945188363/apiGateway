@@ -11,7 +11,7 @@ func TestAddMonitorInfo(t *testing.T) {
 	testMonitorInfo := DBModels.MonitorInfo{
 		MonitorType:   Config.ELK,
 		MonitorStatus: 0,
-		MonitorConfig: "12121",
+		MonitorConfig: "1111122222",
 	}
 	isSuc := testMonitorInfo.SaveMonitorInfo()
 	fmt.Println(isSuc)

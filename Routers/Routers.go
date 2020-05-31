@@ -41,6 +41,11 @@ func NewGinRouter() *gin.Engine {
 		gateway.POST("/saveRuntimeLogSetting", Handlers.SaveLogInfo)
 		gateway.POST("/saveAccessLogSetting", Handlers.SaveLogInfo)
 		gateway.GET("/queryLogSetting", Handlers.GetLogInfoList)
+		// monitor 相关路由
+		gateway.POST("/saveELKUrl", Handlers.SaveMonitors)
+		gateway.POST("/savePrometheus", Handlers.SaveMonitors)
+		gateway.GET("/queryMonitors", Handlers.GetMonitors)
+
 	}
 	ginRouter.POST("/users", Handlers.GetUser)
 	Core.InitApiMapping(ginRouter)

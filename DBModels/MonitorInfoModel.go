@@ -28,8 +28,9 @@ func (p *MonitorInfo) GetMonitorInfo() error {
 func (p *MonitorInfo) SaveMonitorInfo() bool {
 	// 已存在更新，否则创建
 	exist := MonitorInfo{}
-	DB.DBConn().First(&exist, p)
+	DB.DBConn().First(&exist, " monitor_type = ?", p.MonitorType)
 	if exist.Id != 0 {
+		exist.MonitorStatus = p.MonitorStatus
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
 			log.Fatal(err)
 			return false

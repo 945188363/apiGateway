@@ -78,7 +78,7 @@ func SaveLogInfo(ginCtx *gin.Context) {
 		"LogPeriod",
 		"LogSavedTime",
 		"LogRecordField")
-	logInfoModel.LogRecordStatus = 0
+	logInfoModel.LogRecordStatus = 2
 	if logInfo.LogRecordStatus {
 		logInfoModel.LogRecordStatus = 1
 	}
