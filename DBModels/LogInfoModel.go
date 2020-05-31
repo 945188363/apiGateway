@@ -40,7 +40,7 @@ func (p *LogInfo) GetLogInfoByType() error {
 func (p *LogInfo) SaveLogInfo() bool {
 	// 已存在更新，否则创建
 	exist := LogInfo{}
-	DB.DBConn().First(&exist, p)
+	DB.DBConn().First(&exist, "log_Type = ?", p.LogType)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
 			log.Fatal(err)

@@ -32,12 +32,15 @@ func NewGinRouter() *gin.Engine {
 		gateway.GET("/queryRegistry", Handlers.GetRegistryList)
 		gateway.POST("/updateRegistry", Handlers.SaveRegistry)
 		gateway.POST("/deleteRegistry", Handlers.DeleteRegistry)
-		// loadBalance相关路由
+		// loadBalance 相关路由
 		gateway.POST("/createLoadBalance", Handlers.SaveLoadBalance)
 		gateway.GET("/queryLoadBalance", Handlers.GetLoadBalanceList)
 		gateway.POST("/updateLoadBalance", Handlers.SaveLoadBalance)
 		gateway.POST("/deleteLoadBalance", Handlers.DeleteLoadBalance)
-
+		// log 相关路由
+		gateway.POST("/saveRuntimeLogSetting", Handlers.SaveLogInfo)
+		gateway.POST("/saveAccessLogSetting", Handlers.SaveLogInfo)
+		gateway.GET("/queryLogSetting", Handlers.GetLogInfoList)
 	}
 	ginRouter.POST("/users", Handlers.GetUser)
 	Core.InitApiMapping(ginRouter)

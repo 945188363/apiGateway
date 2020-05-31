@@ -3,6 +3,7 @@ package Handlers
 import (
 	"apiGateway/DBModels"
 	"apiGateway/Utils/DataUtil"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"reflect"
@@ -12,7 +13,7 @@ import (
 type LogInfo struct {
 	LogType         int    `form:"LogType"`
 	LogName         string `form:"LogName"`
-	LogRecordStatus int    `form:"LogRecordStatus"`
+	LogRecordStatus bool   `form:"LogRecordStatus"`
 	LogAddress      string `form:"LogAddress"`
 	LogPeriod       string `form:"LogPeriod"`
 	LogSavedTime    int    `form:"LogSavedTime"`
@@ -68,15 +69,20 @@ func GetLogInfoByType(ginCtx *gin.Context) {
 func SaveLogInfo(ginCtx *gin.Context) {
 	var logInfo LogInfo
 	ginCtx.Bind(&logInfo)
+	fmt.Println(logInfo)
 	var logInfoModel DBModels.LogInfo
 	DataUtil.CopyFields(&logInfoModel, logInfo,
 		"LogType",
 		"LogName",
-		"LogRecordStatus",
 		"LogAddress",
 		"LogPeriod",
 		"LogSavedTime",
 		"LogRecordField")
+	logInfoModel.LogRecordStatus = 0
+	if logInfo.LogRecordStatus {
+		logInfoModel.LogRecordStatus = 1
+	}
+	fmt.Println(logInfoModel)
 	saveLogInfo := logInfoModel.SaveLogInfo()
 	if saveLogInfo {
 		ginCtx.JSON(200, gin.H{
