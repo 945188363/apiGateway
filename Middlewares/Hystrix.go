@@ -27,6 +27,13 @@ func (mw *BreakerMw) CircuitBreakerMiddleware() gin.HandlerFunc {
 	}
 	hystrix.ConfigureCommand(cmdName, cmdConf)
 	return func(c *gin.Context) {
+		// 获取api信息
+		api, exists := c.Get("ApiInfo")
+		if exists {
+			mw.Api = api.(DBModels.Api)
+		}
+
+		// 执行hystrix策略
 		_ = hystrix.Do(cmdName, func() error {
 			ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(mw.ApiTimeout+100)*time.Millisecond)
 			var err error

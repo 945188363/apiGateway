@@ -25,6 +25,9 @@ func InitApiMapping(router *gin.Engine) {
 	rateLimit := Middlewares.RateLimiterMw{}
 	// 熔断
 	breaker := Middlewares.BreakerMw{}
+	// 访问统计
+	count := Middlewares.CountMw{}
+
 	api := DBModels.Api{}
 	apiList, err := api.GetApiList()
 	// 根据apiGroup分组
@@ -38,23 +41,37 @@ func InitApiMapping(router *gin.Engine) {
 		for j := 0; j < len(apiListGroup[i]); j++ {
 			rateLimit.Api = apiListGroup[i][j]
 			breaker.Api = apiListGroup[i][j]
+			// 通过协议进行分类
 			if apiListGroup[i][j].ProtocolType == Config.Http {
-
+				// 中间件处理
 				httpInvoker.Api = apiListGroup[i][j]
 				if rateLimit.RateLimitNum > 0 {
-					router.Any(handleUrl(apiListGroup[i][j]), rateLimit.RateLimitMiddleware(), breaker.CircuitBreakerMiddleware(), httpInvoker.Execute)
+					router.Any(handleUrl(apiListGroup[i][j]),
+						count.CountMiddleware(),
+						rateLimit.RateLimitMiddleware(),
+						breaker.CircuitBreakerMiddleware(),
+						httpInvoker.Execute)
 				} else {
-					router.Any(handleUrl(apiListGroup[i][j]), breaker.CircuitBreakerMiddleware(), httpInvoker.Execute)
+					router.Any(handleUrl(apiListGroup[i][j]),
+						count.CountMiddleware(),
+						breaker.CircuitBreakerMiddleware(),
+						httpInvoker.Execute)
 				}
 			} else if apiListGroup[i][j].ProtocolType == Config.GRPC {
 				rpcInvoker.Api = apiListGroup[i][j]
 				if rateLimit.RateLimitNum > 0 {
-					router.Any(handleUrl(apiListGroup[i][j]), rateLimit.RateLimitMiddleware(), breaker.CircuitBreakerMiddleware(), rpcInvoker.Execute)
+					router.Any(handleUrl(apiListGroup[i][j]),
+						count.CountMiddleware(),
+						rateLimit.RateLimitMiddleware(),
+						breaker.CircuitBreakerMiddleware(),
+						rpcInvoker.Execute)
 				} else {
-					router.Any(handleUrl(apiListGroup[i][j]), breaker.CircuitBreakerMiddleware(), rpcInvoker.Execute)
+					router.Any(handleUrl(apiListGroup[i][j]),
+						count.CountMiddleware(),
+						breaker.CircuitBreakerMiddleware(),
+						rpcInvoker.Execute)
 				}
 			}
-
 		}
 	}
 }

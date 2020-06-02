@@ -18,7 +18,6 @@ import (
 	"github.com/micro/go-plugins/registry/consul"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -65,22 +64,12 @@ func (c *RpcInvoker) InvokeMethod2(ctx context.Context, in *rpcService.RpcReques
 	return out, nil
 }
 
-func preExecute(api DBModels.Api) {
-	count := DBModels.Count{
-		ApiName: api.ApiName,
-	}
-	count.SaveCount()
-}
-
 // gRpc协议的RPC调用
 func (p *RpcInvoker) Execute(ginCtx *gin.Context) {
-	// 获取当前API信息
-	apiN := DBModels.Api{ApiUrl: handleUriGroup(ginCtx.Request.RequestURI)}
-	_ = apiN.GetApiByUrl()
-
-	// 统计api访问信息
-	p.Api = apiN
-	preExecute(p.Api)
+	value, exists := ginCtx.Get("ApiInfo")
+	if exists {
+		p.Api = value.(DBModels.Api)
+	}
 	doneChan := make(chan Domain.Message)
 	go func(ctx context.Context) {
 		// 获取consul注册地址
@@ -169,13 +158,11 @@ func NewRpcService(api DBModels.Api, c client.Client) RpcService {
 
 // 协议的RPC调用
 func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
-	// 获取当前API信息
-	apiN := DBModels.Api{ApiUrl: handleUriGroup(ginCtx.Request.RequestURI)}
-	_ = apiN.GetApiByUrl()
-	p.Api = apiN
-
-	// 统计api访问信息
-	preExecute(p.Api)
+	// 获取api信息
+	value, exists := ginCtx.Get("ApiInfo")
+	if exists {
+		p.Api = value.(DBModels.Api)
+	}
 
 	// 先获取该服务在注册中心的集群数量 通过负载均衡选在一个server
 	p.discovery()
@@ -325,18 +312,6 @@ func handleProtocol(protocolType, host, uri string) string {
 		addr = protocolType + "://" + host + uri
 	}
 	return addr
-}
-
-// 处理带组的Uri
-func handleUriGroup(uri string) string {
-	group := DBModels.ApiGroup{}
-	groupList, _ := group.GetApiGroupList()
-	for _, group := range groupList {
-		if strings.Contains(uri, group.ApiGroupName) {
-			return strings.ReplaceAll(uri, "/"+group.ApiGroupName+"/", "")
-		}
-	}
-	return uri
 }
 
 func handlePreResponse(resp *http.Response) Domain.Message {
