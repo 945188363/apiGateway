@@ -45,6 +45,8 @@ func NewGinRouter() *gin.Engine {
 		gateway.POST("/saveELKUrl", Handlers.SaveMonitors)
 		gateway.POST("/savePrometheus", Handlers.SaveMonitors)
 		gateway.GET("/queryMonitors", Handlers.GetMonitors)
+		// api 访问统计路由
+		gateway.GET("/queryCount", Handlers.GetCountList)
 
 	}
 	ginRouter.POST("/users", Handlers.GetUser)

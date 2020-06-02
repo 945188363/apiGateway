@@ -25,6 +25,7 @@ func (p *Api) TableName() string {
 	return "Api"
 }
 
+// 通过组获取API
 func (p *Api) GetApiByGroup(apiGroupName string) ([]Api, error) {
 	var apiList []Api
 	if err := DB.DBConn().Find(&apiList, "api_group = ?", apiGroupName).Error; err != nil {
@@ -34,6 +35,16 @@ func (p *Api) GetApiByGroup(apiGroupName string) ([]Api, error) {
 	return apiList, nil
 }
 
+// 通过URL获取API
+func (p *Api) GetApiByUrl() error {
+	if err := DB.DBConn().First(&p, "api_url like ? ", p.ApiUrl).Error; err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
+// 获取API
 func (p *Api) GetApi() error {
 	if err := DB.DBConn().First(&p, p).Error; err != nil {
 		log.Fatal(err)

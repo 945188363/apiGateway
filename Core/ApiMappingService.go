@@ -39,6 +39,7 @@ func InitApiMapping(router *gin.Engine) {
 			rateLimit.Api = apiListGroup[i][j]
 			breaker.Api = apiListGroup[i][j]
 			if apiListGroup[i][j].ProtocolType == Config.Http {
+
 				httpInvoker.Api = apiListGroup[i][j]
 				if rateLimit.RateLimitNum > 0 {
 					router.Any(handleUrl(apiListGroup[i][j]), rateLimit.RateLimitMiddleware(), breaker.CircuitBreakerMiddleware(), httpInvoker.Execute)

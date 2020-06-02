@@ -10,4 +10,7 @@ const (
 
 	Http = "http"
 	GRPC = "gRPC"
+
+	DateTimeFormat = "yyyy-MM-dd hh-mm-ss"
+	DateFormat     = "yyyy-MM-dd"
 )

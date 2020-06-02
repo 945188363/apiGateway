@@ -45,6 +45,7 @@ func SaveMonitors(ginCtx *gin.Context) {
 	fmt.Println(monitor)
 	var monitorModel DBModels.MonitorInfo
 	DataUtil.CopyFields(&monitorModel, monitor,
+
 		"MonitorType",
 		"MonitorConfig")
 	monitorModel.MonitorStatus = 2
