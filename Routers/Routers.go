@@ -47,6 +47,7 @@ func NewGinRouter() *gin.Engine {
 		gateway.GET("/queryMonitors", Handlers.GetMonitors)
 		// api 访问统计路由
 		gateway.GET("/queryCount", Handlers.GetCountList)
+		gateway.GET("/queryCpu", Handlers.GetCpuInfo)
 
 	}
 	ginRouter.POST("/users", Handlers.GetUser)

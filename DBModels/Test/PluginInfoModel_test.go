@@ -4,7 +4,9 @@ import (
 	"apiGateway/Config"
 	"apiGateway/DBModels"
 	"fmt"
+	"github.com/shirou/gopsutil/cpu"
 	"testing"
+	"time"
 )
 
 func TestAddPluginInfo(t *testing.T) {
@@ -46,4 +48,17 @@ func TestGetPluginInfo(t *testing.T) {
 		return
 	}
 	fmt.Println(testPluginInfo)
+}
+
+func TestCpu(t *testing.T) {
+	cpuInfos, _ := cpu.Info()
+	res, _ := cpu.Times(false)
+	for _, ci := range cpuInfos {
+		fmt.Println(ci)
+	}
+	fmt.Println(((res[0].Total() - res[0].Idle) / res[0].Total()) * 100)
+
+	percent, _ := cpu.Percent(time.Second, false)
+	fmt.Println(percent)
+
 }

@@ -3,6 +3,7 @@ package Handlers
 import (
 	"apiGateway/DBModels"
 	"github.com/gin-gonic/gin"
+	"github.com/shirou/gopsutil/cpu"
 )
 
 // Api相关处理
@@ -25,5 +26,18 @@ func GetCountList(ginCtx *gin.Context) {
 	ginCtx.JSON(200, gin.H{
 		"message": "query count list error",
 		"data":    counts,
+	})
+}
+
+func GetCpuInfo(ginCtx *gin.Context) {
+	res, err := cpu.Times(false)
+	if err != nil {
+		ginCtx.JSON(502, gin.H{
+			"message": "get cpu info error",
+		})
+	}
+	ginCtx.JSON(200, gin.H{
+		"message": "query count list error",
+		"data":    ((res[0].Total() - res[0].Idle) / res[0].Total()) * 100,
 	})
 }
