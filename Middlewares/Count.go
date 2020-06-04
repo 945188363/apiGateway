@@ -38,5 +38,5 @@ func handleUriGroup(uri string) string {
 			return strings.ReplaceAll(uri, "/"+group.ApiGroupName+"/", "")
 		}
 	}
-	return uri
+	return strings.Replace(uri, "/", "", 1)
 }

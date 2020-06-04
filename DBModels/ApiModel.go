@@ -37,7 +37,7 @@ func (p *Api) GetApiByGroup(apiGroupName string) ([]Api, error) {
 
 // 通过URL获取API
 func (p *Api) GetApiByUrl() error {
-	if err := DB.DBConn().First(&p, "api_url like ? ", p.ApiUrl).Error; err != nil {
+	if err := DB.DBConn().First(&p, "api_url = ? ", p.ApiUrl).Error; err != nil {
 		log.Fatal(err)
 		return err
 	}

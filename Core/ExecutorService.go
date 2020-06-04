@@ -2,6 +2,8 @@ package Core
 
 import (
 	"apiGateway/Config"
+	"apiGateway/Constant/Code"
+	"apiGateway/Constant/Message"
 	"apiGateway/Core/Domain"
 	"apiGateway/Core/rpcService"
 	"apiGateway/DBModels"
@@ -118,6 +120,8 @@ func (p *RpcInvoker) Execute(ginCtx *gin.Context) {
 			return
 		}
 		var msg Domain.Message
+		msg.Code = Code.RPC_SUCCESS
+		msg.Msg = Message.RPC_SUCCESS
 		msg.Data = make(map[string]interface{})
 		msg.Data["Num"] = DataUtil.BytesToInt(resp.Response)
 		doneChan <- msg
@@ -343,7 +347,9 @@ func handleResponseReturn(res Domain.Message, returnType string, ginCtx *gin.Con
 		ginCtx.JSON(res.Code, res)
 		break
 	case Config.Xml:
-		ginCtx.XML(res.Code, res)
+		rawBytes, _ := json.Marshal(res)
+		dataStr := string(rawBytes)
+		ginCtx.XML(res.Code, Domain.NewMessageXml(res.Code, res.Msg, dataStr))
 		break
 	default:
 		ginCtx.JSON(res.Code, res)

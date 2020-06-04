@@ -15,8 +15,21 @@ type Message struct {
 }
 
 func NewMessage(c int, m string, d map[string]interface{}) Message {
-
 	return Message{
+		Code: c,
+		Msg:  m,
+		Data: d,
+	}
+}
+
+type MessageXml struct {
+	Code int
+	Msg  string
+	Data string
+}
+
+func NewMessageXml(c int, m string, d string) MessageXml {
+	return MessageXml{
 		Code: c,
 		Msg:  m,
 		Data: d,
