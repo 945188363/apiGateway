@@ -2,7 +2,7 @@ package DBModels
 
 import (
 	"apiGateway/Common/DB"
-	"log"
+	"apiGateway/Utils/ComponentUtil"
 )
 
 type MonitorInfo struct {
@@ -19,7 +19,7 @@ func (p *MonitorInfo) TableName() string {
 
 func (p *MonitorInfo) GetMonitorInfo() error {
 	if err := DB.DBConn().First(&p, p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -32,13 +32,13 @@ func (p *MonitorInfo) SaveMonitorInfo() bool {
 	if exist.Id != 0 {
 		exist.MonitorStatus = p.MonitorStatus
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
-			log.Fatal(err)
+			ComponentUtil.RuntimeLog().Error(err)
 			return false
 		}
 		return true
 	}
 	if err := DB.DBConn().Create(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -46,7 +46,7 @@ func (p *MonitorInfo) SaveMonitorInfo() bool {
 
 func (p *MonitorInfo) DeleteMonitorInfo() bool {
 	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -55,7 +55,7 @@ func (p *MonitorInfo) DeleteMonitorInfo() bool {
 func (p *MonitorInfo) GetMonitorInfoList() ([]MonitorInfo, error) {
 	var monitorInfoList []MonitorInfo
 	if err := DB.DBConn().Find(&monitorInfoList).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return nil, err
 	}
 	return monitorInfoList, nil

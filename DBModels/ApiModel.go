@@ -2,7 +2,7 @@ package DBModels
 
 import (
 	"apiGateway/Common/DB"
-	"log"
+	"apiGateway/Utils/ComponentUtil"
 )
 
 type Api struct {
@@ -29,7 +29,7 @@ func (p *Api) TableName() string {
 func (p *Api) GetApiByGroup(apiGroupName string) ([]Api, error) {
 	var apiList []Api
 	if err := DB.DBConn().Find(&apiList, "api_group = ?", apiGroupName).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return nil, err
 	}
 	return apiList, nil
@@ -38,7 +38,7 @@ func (p *Api) GetApiByGroup(apiGroupName string) ([]Api, error) {
 // 通过URL获取API
 func (p *Api) GetApiByUrl() error {
 	if err := DB.DBConn().First(&p, "api_url = ? ", p.ApiUrl).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -47,7 +47,7 @@ func (p *Api) GetApiByUrl() error {
 // 获取API
 func (p *Api) GetApi() error {
 	if err := DB.DBConn().First(&p, p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -72,13 +72,13 @@ func (p *Api) SaveApi() bool {
 			ApiGroup:         p.ApiGroup,
 		}
 		if err := DB.DBConn().Model(&exist).Updates(&updateApi).Error; err != nil {
-			log.Fatal(err)
+			ComponentUtil.RuntimeLog().Error(err)
 			return false
 		}
 		return true
 	}
 	if err := DB.DBConn().Create(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -86,7 +86,7 @@ func (p *Api) SaveApi() bool {
 
 func (p *Api) DeleteApi() bool {
 	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -95,7 +95,7 @@ func (p *Api) DeleteApi() bool {
 func (p *Api) GetApiList() ([]Api, error) {
 	var apiList []Api
 	if err := DB.DBConn().Find(&apiList).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return nil, err
 	}
 	return apiList, nil

@@ -2,13 +2,13 @@ package Test
 
 import (
 	"apiGateway/Config"
-	"apiGateway/DBModels"
+	"apiGateway/DBModels/LogModel"
 	"fmt"
 	"testing"
 )
 
 func TestAddLogInfo(t *testing.T) {
-	testLogInfo := DBModels.LogInfo{
+	testLogInfo := LogModel.LogInfo{
 		LogType:         Config.RuntimeLog,
 		LogName:         "11112123",
 		LogRecordStatus: 0,
@@ -20,7 +20,7 @@ func TestAddLogInfo(t *testing.T) {
 }
 
 func TestDelInfo(t *testing.T) {
-	testLogInfo := DBModels.LogInfo{
+	testLogInfo := LogModel.LogInfo{
 		LogType: Config.AccessLog,
 		LogName: "test",
 	}
@@ -29,7 +29,7 @@ func TestDelInfo(t *testing.T) {
 }
 
 func TestGetAllInfo(t *testing.T) {
-	testLogInfo := DBModels.LogInfo{}
+	testLogInfo := LogModel.LogInfo{}
 	logInfoList, err := testLogInfo.GetLogInfoList()
 	if err != nil {
 		fmt.Println("error")
@@ -39,7 +39,7 @@ func TestGetAllInfo(t *testing.T) {
 }
 
 func TestGetInfo(t *testing.T) {
-	testLogInfo := DBModels.LogInfo{
+	testLogInfo := LogModel.LogInfo{
 		LogType: Config.AccessLog,
 		LogName: "test",
 	}

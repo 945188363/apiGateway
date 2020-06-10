@@ -6,6 +6,7 @@ import (
 	"apiGateway/Core/Domain"
 	"apiGateway/DBModels"
 	"apiGateway/Utils"
+	"apiGateway/Utils/ComponentUtil"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -19,6 +20,7 @@ type AuthMw struct {
 func (mw *AuthMw) JWTAuthMiddleware() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
+		ComponentUtil.RuntimeLog().Info("start Auth MiddleWare...")
 		// 如果是网关操作的接口直接放行
 		if url := c.Request.URL.String(); strings.HasPrefix(url, "/gateway") {
 			c.Next()
@@ -67,6 +69,7 @@ func (mw *AuthMw) JWTAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		c.Next()
+		ComponentUtil.RuntimeLog().Info("end Auth MiddleWare...")
 	}
 }
 

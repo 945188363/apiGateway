@@ -1,4 +1,4 @@
-package DBModels
+package LogModel
 
 import (
 	"apiGateway/Common/DB"
@@ -23,6 +23,7 @@ func (p *LogInfo) TableName() string {
 
 func (p *LogInfo) GetLogInfo() error {
 	if err := DB.DBConn().First(&p, p).Error; err != nil {
+		// ComponentUtil.RuntimeLog().Error(err)
 		log.Fatal(err)
 		return err
 	}
@@ -31,6 +32,7 @@ func (p *LogInfo) GetLogInfo() error {
 
 func (p *LogInfo) GetLogInfoByType() error {
 	if err := DB.DBConn().Find(&p, "log_Type = ?", p.LogType).Error; err != nil {
+		// ComponentUtil.RuntimeLog().Error(err)
 		log.Fatal(err)
 		return err
 	}
@@ -43,12 +45,14 @@ func (p *LogInfo) SaveLogInfo() bool {
 	DB.DBConn().First(&exist, "log_Type = ?", p.LogType)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
+			// ComponentUtil.RuntimeLog().Error(err)
 			log.Fatal(err)
 			return false
 		}
 		return true
 	}
 	if err := DB.DBConn().Create(&p).Error; err != nil {
+		// ComponentUtil.RuntimeLog().Error(err)
 		log.Fatal(err)
 		return false
 	}
@@ -57,6 +61,7 @@ func (p *LogInfo) SaveLogInfo() bool {
 
 func (p *LogInfo) DeleteLogInfo() bool {
 	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
+		// ComponentUtil.RuntimeLog().Error(err)
 		log.Fatal(err)
 		return false
 	}
@@ -66,6 +71,7 @@ func (p *LogInfo) DeleteLogInfo() bool {
 func (p *LogInfo) GetLogInfoList() ([]LogInfo, error) {
 	var LogInfoList []LogInfo
 	if err := DB.DBConn().Find(&LogInfoList).Error; err != nil {
+		// ComponentUtil.RuntimeLog().Error(err)
 		log.Fatal(err)
 		return nil, err
 	}

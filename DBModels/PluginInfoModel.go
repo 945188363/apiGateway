@@ -2,7 +2,7 @@ package DBModels
 
 import (
 	"apiGateway/Common/DB"
-	"log"
+	"apiGateway/Utils/ComponentUtil"
 )
 
 type PluginInfo struct {
@@ -20,7 +20,7 @@ func (p *PluginInfo) TableName() string {
 
 func (p *PluginInfo) GetPluginInfo() error {
 	if err := DB.DBConn().First(&p, p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -32,13 +32,13 @@ func (p *PluginInfo) SavePluginInfo() bool {
 	DB.DBConn().First(&exist, p)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
-			log.Fatal(err)
+			ComponentUtil.RuntimeLog().Error(err)
 			return false
 		}
 		return true
 	}
 	if err := DB.DBConn().Create(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -46,7 +46,7 @@ func (p *PluginInfo) SavePluginInfo() bool {
 
 func (p *PluginInfo) DeletePluginInfo() bool {
 	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -55,7 +55,7 @@ func (p *PluginInfo) DeletePluginInfo() bool {
 func (p *PluginInfo) GetPluginInfoList() ([]PluginInfo, error) {
 	var pluginInfoList []PluginInfo
 	if err := DB.DBConn().Find(&pluginInfoList).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return nil, err
 	}
 	return pluginInfoList, nil

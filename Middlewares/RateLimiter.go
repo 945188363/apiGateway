@@ -2,6 +2,7 @@ package Middlewares
 
 import (
 	"apiGateway/DBModels"
+	"apiGateway/Utils/ComponentUtil"
 	"github.com/didip/tollbooth"
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,8 @@ func (mw *RateLimiterMw) RateLimitMiddleware() gin.HandlerFunc {
 	lmt := tollbooth.NewLimiter(float64(mw.RateLimitNum), nil)
 	lmt.SetMessage("error,request too many times,you are limited")
 	return func(c *gin.Context) {
+		ComponentUtil.RuntimeLog().Info("start RateLimit MiddleWare...")
+
 		// 获取APi信息
 		api, exists := c.Get("ApiInfo")
 		if exists {
@@ -28,5 +31,7 @@ func (mw *RateLimiterMw) RateLimitMiddleware() gin.HandlerFunc {
 		} else {
 			c.Next()
 		}
+		ComponentUtil.RuntimeLog().Info("end RateLimit MiddleWare...")
+
 	}
 }

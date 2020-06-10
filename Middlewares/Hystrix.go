@@ -4,6 +4,7 @@ import (
 	"apiGateway/Constant/Code"
 	"apiGateway/Core/Domain"
 	"apiGateway/DBModels"
+	"apiGateway/Utils/ComponentUtil"
 	"context"
 	"errors"
 	"github.com/afex/hystrix-go/hystrix"
@@ -27,6 +28,7 @@ func (mw *BreakerMw) CircuitBreakerMiddleware() gin.HandlerFunc {
 	}
 	hystrix.ConfigureCommand(cmdName, cmdConf)
 	return func(c *gin.Context) {
+		ComponentUtil.RuntimeLog().Info("start Count MiddleWare...")
 		// 获取api信息
 		api, exists := c.Get("ApiInfo")
 		if exists {
@@ -62,6 +64,7 @@ func (mw *BreakerMw) CircuitBreakerMiddleware() gin.HandlerFunc {
 			breakerResponse(c, mw.ApiReturnContent)
 			return nil
 		})
+		ComponentUtil.RuntimeLog().Info("end Count MiddleWare...")
 	}
 }
 

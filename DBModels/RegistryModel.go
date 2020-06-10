@@ -2,7 +2,7 @@ package DBModels
 
 import (
 	"apiGateway/Common/DB"
-	"log"
+	"apiGateway/Utils/ComponentUtil"
 )
 
 type Registry struct {
@@ -19,7 +19,7 @@ func (p *Registry) TableName() string {
 
 func (p *Registry) GetRegistry() error {
 	if err := DB.DBConn().First(&p, p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -31,13 +31,13 @@ func (p *Registry) SaveRegistry() bool {
 	DB.DBConn().First(&exist, "name = ?", p.Name)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
-			log.Fatal(err)
+			ComponentUtil.RuntimeLog().Error(err)
 			return false
 		}
 		return true
 	}
 	if err := DB.DBConn().Create(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -45,7 +45,7 @@ func (p *Registry) SaveRegistry() bool {
 
 func (p *Registry) DeleteRegistry() bool {
 	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -54,7 +54,7 @@ func (p *Registry) DeleteRegistry() bool {
 func (p *Registry) GetRegistryList() ([]Registry, error) {
 	var RegistryList []Registry
 	if err := DB.DBConn().Find(&RegistryList).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return nil, err
 	}
 	return RegistryList, nil

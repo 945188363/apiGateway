@@ -2,7 +2,7 @@ package DBModels
 
 import (
 	"apiGateway/Common/DB"
-	"log"
+	"apiGateway/Utils/ComponentUtil"
 )
 
 type IpRestriction struct {
@@ -23,7 +23,7 @@ func (p *IpRestriction) TableName() string {
 
 func (p *IpRestriction) GetIpRestrictionByApi(api string) error {
 	if err := DB.DBConn().First(&p, "api_list like ? and global = ?", api, 0).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -31,7 +31,7 @@ func (p *IpRestriction) GetIpRestrictionByApi(api string) error {
 
 func (p *IpRestriction) GetIpRestrictionByApiGroup(apiGroup string) error {
 	if err := DB.DBConn().First(&p, "api_group LIKE ? and  global = ?", apiGroup, 0).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -39,7 +39,7 @@ func (p *IpRestriction) GetIpRestrictionByApiGroup(apiGroup string) error {
 
 func (p *IpRestriction) GetGlobalIpRestriction() error {
 	if err := DB.DBConn().First(&p, "global = ?", 1).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -51,13 +51,13 @@ func (p *IpRestriction) SaveIpRestriction() bool {
 	DB.DBConn().First(&exist, p)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
-			log.Fatal(err)
+			ComponentUtil.RuntimeLog().Error(err)
 			return false
 		}
 		return true
 	}
 	if err := DB.DBConn().Create(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -65,7 +65,7 @@ func (p *IpRestriction) SaveIpRestriction() bool {
 
 func (p *IpRestriction) DeleteIpRestriction() bool {
 	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -74,7 +74,7 @@ func (p *IpRestriction) DeleteIpRestriction() bool {
 func (p *IpRestriction) GetIpRestrictionList() ([]IpRestriction, error) {
 	var ipRestrictionList []IpRestriction
 	if err := DB.DBConn().Find(&ipRestrictionList).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return nil, err
 	}
 	return ipRestrictionList, nil

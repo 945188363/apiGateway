@@ -2,6 +2,7 @@ package Middlewares
 
 import (
 	"apiGateway/DBModels"
+	"apiGateway/Utils/ComponentUtil"
 	"github.com/gin-gonic/gin"
 	"strings"
 )
@@ -12,6 +13,7 @@ type CountMw struct {
 
 func (mw *CountMw) CountMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ComponentUtil.RuntimeLog().Info("start Count MiddleWare...")
 		// 获取当前API信息
 		apiN := DBModels.Api{ApiUrl: handleUriGroup(c.Request.URL.Path)}
 		_ = apiN.GetApiByUrl()
@@ -26,6 +28,7 @@ func (mw *CountMw) CountMiddleware() gin.HandlerFunc {
 
 		// 下一步
 		c.Next()
+		ComponentUtil.RuntimeLog().Info("end Count MiddleWare...")
 	}
 }
 

@@ -2,7 +2,7 @@ package ComponentUtil
 
 import (
 	"apiGateway/Config"
-	"apiGateway/DBModels"
+	"apiGateway/DBModels/LogModel"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/pkg/errors"
 	"github.com/rifflock/lfshook"
@@ -18,9 +18,10 @@ import (
 
 var accessLog *logrus.Logger
 var runtimeLog *logrus.Logger
-var runtimeLogInfo *DBModels.LogInfo
+var runtimeLogInfo *LogModel.LogInfo
 
-func Init() {
+func init() {
+	runtimeLogInfo = new(LogModel.LogInfo)
 	runtimeLogInfo.LogType = Config.RuntimeLog
 	err := runtimeLogInfo.GetLogInfoByType()
 	if err != nil {
@@ -28,7 +29,7 @@ func Init() {
 	}
 }
 
-func AccessLog(logInfo *DBModels.LogInfo) *logrus.Logger {
+func AccessLog(logInfo *LogModel.LogInfo) *logrus.Logger {
 
 	// 日志文件
 	fileName := path.Join(logInfo.LogAddress, logInfo.LogName)

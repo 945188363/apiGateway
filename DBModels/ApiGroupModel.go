@@ -2,7 +2,7 @@ package DBModels
 
 import (
 	"apiGateway/Common/DB"
-	"log"
+	"apiGateway/Utils/ComponentUtil"
 )
 
 type ApiGroup struct {
@@ -18,7 +18,7 @@ func (p *ApiGroup) TableName() string {
 
 func (p *ApiGroup) GetApiGroup() error {
 	if err := DB.DBConn().First(&p, p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -34,13 +34,13 @@ func (p *ApiGroup) SaveApiGroup() bool {
 			Description:  p.Description,
 		}
 		if err := DB.DBConn().Model(&exist).Updates(&updateApi).Error; err != nil {
-			log.Fatal(err)
+			ComponentUtil.RuntimeLog().Error(err)
 			return false
 		}
 		return true
 	}
 	if err := DB.DBConn().Create(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -48,7 +48,7 @@ func (p *ApiGroup) SaveApiGroup() bool {
 
 func (p *ApiGroup) DeleteApiGroup() bool {
 	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -57,7 +57,7 @@ func (p *ApiGroup) DeleteApiGroup() bool {
 func (p *ApiGroup) GetApiGroupList() ([]ApiGroup, error) {
 	var apiGroupList []ApiGroup
 	if err := DB.DBConn().Find(&apiGroupList).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return nil, err
 	}
 	return apiGroupList, nil

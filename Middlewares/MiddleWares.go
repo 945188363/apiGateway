@@ -2,7 +2,7 @@ package Middlewares
 
 import (
 	"apiGateway/Config"
-	"apiGateway/DBModels"
+	"apiGateway/DBModels/LogModel"
 	"apiGateway/Utils/ComponentUtil"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -41,7 +41,7 @@ func HeadMiddleware() gin.HandlerFunc {
 // 日志中间件
 func LoggerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		accessLogInfo := DBModels.LogInfo{}
+		accessLogInfo := LogModel.LogInfo{}
 		accessLogInfo.LogType = Config.AccessLog
 		err := accessLogInfo.GetLogInfoByType()
 		if err != nil {

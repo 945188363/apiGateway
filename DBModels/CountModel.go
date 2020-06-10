@@ -2,7 +2,7 @@ package DBModels
 
 import (
 	"apiGateway/Common/DB"
-	"log"
+	"apiGateway/Utils/ComponentUtil"
 )
 
 type Count struct {
@@ -18,7 +18,7 @@ func (p *Count) TableName() string {
 
 func (p *Count) GetCountByApiName(apiName string) error {
 	if err := DB.DBConn().First(&p, "where api_name = ?", apiName).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -26,7 +26,7 @@ func (p *Count) GetCountByApiName(apiName string) error {
 
 func (p *Count) SaveCount() bool {
 	if err := DB.DBConn().Create(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -35,7 +35,7 @@ func (p *Count) SaveCount() bool {
 func (p *Count) GetCountListByData(start, end string) ([]Count, error) {
 	var countList []Count
 	if err := DB.DBConn().Order("time").Find(&countList, "time >= ? and time <= ? ", start, end).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return nil, err
 	}
 	return countList, nil

@@ -6,6 +6,7 @@ import (
 	"apiGateway/Core/Domain"
 	"apiGateway/DBModels"
 	"apiGateway/Utils"
+	"apiGateway/Utils/ComponentUtil"
 	"apiGateway/Utils/DataUtil"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -19,6 +20,8 @@ type IpRestrictionMw struct {
 // 黑白名单中间件
 func (mw *IpRestrictionMw) GlobalIpRestrictionMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ComponentUtil.RuntimeLog().Info("start IpRestriction MiddleWare...")
+		// 获取真实IP
 		remoteIp := Utils.RealIP(c.Request)
 		globalIpRestriction := DBModels.IpRestriction{}
 		err := globalIpRestriction.GetGlobalIpRestriction()
@@ -47,6 +50,7 @@ func (mw *IpRestrictionMw) GlobalIpRestrictionMiddleware() gin.HandlerFunc {
 			})
 			c.Abort()
 		}
+		ComponentUtil.RuntimeLog().Info("end IpRestriction MiddleWare...")
 	}
 }
 

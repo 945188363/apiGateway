@@ -2,7 +2,7 @@ package DBModels
 
 import (
 	"apiGateway/Common/DB"
-	"log"
+	"apiGateway/Utils/ComponentUtil"
 )
 
 type LoadBalance struct {
@@ -20,7 +20,7 @@ func (p *LoadBalance) TableName() string {
 
 func (p *LoadBalance) GetLoadBalance() error {
 	if err := DB.DBConn().First(&p, p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -28,7 +28,7 @@ func (p *LoadBalance) GetLoadBalance() error {
 
 func (p *LoadBalance) GetLoadBalanceByServiceName(serviceName string) error {
 	if err := DB.DBConn().First(&p, "service_name like ?", serviceName).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
 	return nil
@@ -40,13 +40,13 @@ func (p *LoadBalance) SaveLoadBalance() bool {
 	DB.DBConn().First(&exist, "name = ?", p.Name)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
-			log.Fatal(err)
+			ComponentUtil.RuntimeLog().Error(err)
 			return false
 		}
 		return true
 	}
 	if err := DB.DBConn().Create(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -54,7 +54,7 @@ func (p *LoadBalance) SaveLoadBalance() bool {
 
 func (p *LoadBalance) DeleteLoadBalance() bool {
 	if err := DB.DBConn().Where(p).Delete(&p).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return false
 	}
 	return true
@@ -63,7 +63,7 @@ func (p *LoadBalance) DeleteLoadBalance() bool {
 func (p *LoadBalance) GetLoadBalanceList() ([]LoadBalance, error) {
 	var LoadBalanceList []LoadBalance
 	if err := DB.DBConn().Find(&LoadBalanceList).Error; err != nil {
-		log.Fatal(err)
+		ComponentUtil.RuntimeLog().Error(err)
 		return nil, err
 	}
 	return LoadBalanceList, nil

@@ -19,6 +19,8 @@ type ParameterCheckMw struct {
 // 限流中间件
 func (mw *ParameterCheckMw) ParameterCheckMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ComponentUtil.RuntimeLog().Info("start ParameterCheck MiddleWare...")
+
 		if c.Request.Method == http.MethodGet {
 			query := c.Request.URL.Query()
 			checkParams(query, c)
@@ -31,6 +33,7 @@ func (mw *ParameterCheckMw) ParameterCheckMiddleware() gin.HandlerFunc {
 			// defer c.Request.Body.Close()
 			// body, _ := ioutil.ReadAll(c.Request.Body)
 		}
+		ComponentUtil.RuntimeLog().Info("end ParameterCheck MiddleWare...")
 	}
 }
 
