@@ -32,6 +32,7 @@ func AccessLog(logInfo *DBModels.LogInfo) *logrus.Logger {
 
 	// 日志文件
 	fileName := path.Join(logInfo.LogAddress, logInfo.LogName)
+	fileName += ".log"
 	// 写入文件
 	src, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err != nil {

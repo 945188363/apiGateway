@@ -11,6 +11,7 @@ func NewGinRouter() *gin.Engine {
 	ginRouter := gin.Default()
 	ginRouter.Use(Middlewares.HeadMiddleware())
 	ginRouter.Use(gin.Recovery())
+	ginRouter.Use(Middlewares.LoggerMiddleware())
 	v1GinGroup := ginRouter.Group("/v1")
 	{
 		v1GinGroup.GET("/prods", Handlers.GetProdsList)
