@@ -48,7 +48,7 @@ func (p *IpRestriction) GetGlobalIpRestriction() error {
 func (p *IpRestriction) SaveIpRestriction() bool {
 	// 已存在更新，否则创建
 	exist := IpRestriction{}
-	DB.DBConn().First(&exist, p)
+	DB.DBConn().First(&exist, "name = ?", p.Name)
 	if exist.Id != 0 {
 		if err := DB.DBConn().Model(&exist).Updates(&p).Error; err != nil {
 			ComponentUtil.RuntimeLog().Error(err)
