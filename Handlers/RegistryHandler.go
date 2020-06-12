@@ -42,9 +42,38 @@ func GetRegistryList(ginCtx *gin.Context) {
 	})
 }
 
+func GetRegistryListByName(ginCtx *gin.Context) {
+	var registry Registry
+	ginCtx.ShouldBind(&registry)
+	var registryModel DBModels.Registry
+	DataUtil.CopyFields(&registryModel, registry,
+		"Name",
+		"RegistryType",
+		"Addr")
+	ComponentUtil.RuntimeLog().Info("transfer data to Model :", registryModel)
+	registryList, err := registryModel.GetRegistryListByName()
+	if err != nil {
+		ComponentUtil.RuntimeLog().Info("fetch registry list error")
+		ginCtx.JSON(502, gin.H{
+			"message": "fetch registry list error",
+		})
+	}
+	if len(registryList) == 0 {
+		ComponentUtil.RuntimeLog().Info("registry list do not exist")
+		ginCtx.JSON(404, gin.H{
+			"message": "registry list do not exist",
+		})
+	}
+	ComponentUtil.RuntimeLog().Info("query registry list success")
+	ginCtx.JSON(200, gin.H{
+		"message": "query registry list success",
+		"data":    registryList,
+	})
+}
+
 func SaveRegistry(ginCtx *gin.Context) {
 	var registry Registry
-	ginCtx.Bind(&registry)
+	ginCtx.ShouldBind(&registry)
 	var registryModel DBModels.Registry
 	DataUtil.CopyFields(&registryModel, registry,
 		"Name",
@@ -67,7 +96,7 @@ func SaveRegistry(ginCtx *gin.Context) {
 
 func DeleteRegistry(ginCtx *gin.Context) {
 	var registry Registry
-	ginCtx.Bind(&registry)
+	ginCtx.ShouldBind(&registry)
 	var registryModel DBModels.Registry
 	DataUtil.CopyFields(&registryModel, registry,
 		"Name",

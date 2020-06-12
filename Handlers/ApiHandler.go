@@ -51,8 +51,31 @@ func GetApiLst(ginCtx *gin.Context) {
 	})
 }
 
-func GetApi(ginCtx *gin.Context) {
-	ginCtx.String(200, "prod api")
+func GetApiListByApiNameAndGroupName(ginCtx *gin.Context) {
+	var api Api
+	ginCtx.ShouldBind(&api)
+	var apiModel DBModels.Api
+	DataUtil.CopyFields(&apiModel, api)
+	fmt.Println(apiModel)
+	ComponentUtil.RuntimeLog().Info("transfer data to Model :", apiModel)
+	apiList, err := apiModel.GetApiListByApiNameAndGroupName()
+	if err != nil {
+		ComponentUtil.RuntimeLog().Info("fetch api list error")
+		ginCtx.JSON(502, gin.H{
+			"message": "fetch api list error",
+		})
+	}
+	if len(apiList) == 0 {
+		ComponentUtil.RuntimeLog().Info("api list do not exist")
+		ginCtx.JSON(404, gin.H{
+			"message": "api list do not exist",
+		})
+	}
+	ComponentUtil.RuntimeLog().Info("query api list success")
+	ginCtx.JSON(200, gin.H{
+		"message": "query api list success",
+		"data":    apiList,
+	})
 }
 
 func GetApiByGroup(ginCtx *gin.Context) {
@@ -91,7 +114,7 @@ func GetApiByGroup(ginCtx *gin.Context) {
 
 func SaveApi(ginCtx *gin.Context) {
 	var api Api
-	ginCtx.Bind(&api)
+	ginCtx.ShouldBind(&api)
 	fmt.Println(api)
 	var apiModel DBModels.Api
 	DataUtil.CopyFields(&apiModel, api)
@@ -113,7 +136,7 @@ func SaveApi(ginCtx *gin.Context) {
 
 func DeleteApi(ginCtx *gin.Context) {
 	var api Api
-	ginCtx.Bind(&api)
+	ginCtx.ShouldBind(&api)
 	var apiModel DBModels.Api
 	DataUtil.CopyFields(&apiModel, api)
 	ComponentUtil.RuntimeLog().Info("transfer data to Model :", apiModel)

@@ -27,7 +27,7 @@ func (p *LoadBalance) GetLoadBalance() error {
 }
 
 func (p *LoadBalance) GetLoadBalanceByServiceName(serviceName string) error {
-	if err := DB.DBConn().First(&p, "service_name like ?", serviceName).Error; err != nil {
+	if err := DB.DBConn().First(&p, "service_name like ?", "%"+serviceName+"%").Error; err != nil {
 		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
@@ -58,6 +58,15 @@ func (p *LoadBalance) DeleteLoadBalance() bool {
 		return false
 	}
 	return true
+}
+
+func (p *LoadBalance) GetLoadBalanceListByName() ([]LoadBalance, error) {
+	var LoadBalanceList []LoadBalance
+	if err := DB.DBConn().Find(&LoadBalanceList, "name like ?", "%"+p.Name+"%").Error; err != nil {
+		ComponentUtil.RuntimeLog().Error(err)
+		return nil, err
+	}
+	return LoadBalanceList, nil
 }
 
 func (p *LoadBalance) GetLoadBalanceList() ([]LoadBalance, error) {

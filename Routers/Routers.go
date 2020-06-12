@@ -21,21 +21,25 @@ func NewGinRouter() *gin.Engine {
 		// api 相关路由
 		gateway.POST("/createApiDetail", Handlers.SaveApi)
 		gateway.GET("/queryApiDetailList", Handlers.GetApiLst)
+		gateway.POST("/queryApiListByApiNameAndGroupName", Handlers.GetApiListByApiNameAndGroupName)
 		gateway.POST("/updateApiDetail", Handlers.SaveApi)
 		gateway.POST("deleteApiDetail", Handlers.DeleteApi)
 		// api group 相关路由
 		gateway.POST("/createApiGroupDetail", Handlers.SaveApiGroup)
 		gateway.GET("/queryApiGroupList", Handlers.GetApiGroupList)
+		gateway.POST("/queryApiGroupListByGroupName", Handlers.GetApiGroupListByGroupName)
 		gateway.POST("/updateApiGroupDetail", Handlers.SaveApiGroup)
 		gateway.POST("/deleteApiGroupDetail", Handlers.DeleteApiGroup)
 		// registry 相关路由
 		gateway.POST("/createRegistry", Handlers.SaveRegistry)
 		gateway.GET("/queryRegistry", Handlers.GetRegistryList)
+		gateway.POST("/queryRegistryByName", Handlers.GetRegistryListByName)
 		gateway.POST("/updateRegistry", Handlers.SaveRegistry)
 		gateway.POST("/deleteRegistry", Handlers.DeleteRegistry)
 		// loadBalance 相关路由
 		gateway.POST("/createLoadBalance", Handlers.SaveLoadBalance)
 		gateway.GET("/queryLoadBalance", Handlers.GetLoadBalanceList)
+		gateway.POST("/queryLoadBalanceByName", Handlers.GetLoadBalanceListByName)
 		gateway.POST("/updateLoadBalance", Handlers.SaveLoadBalance)
 		gateway.POST("/deleteLoadBalance", Handlers.DeleteLoadBalance)
 		// log 相关路由

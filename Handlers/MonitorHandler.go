@@ -45,7 +45,7 @@ func GetMonitors(ginCtx *gin.Context) {
 
 func SaveMonitors(ginCtx *gin.Context) {
 	var monitor Monitor
-	ginCtx.Bind(&monitor)
+	ginCtx.ShouldBind(&monitor)
 	fmt.Println(monitor)
 	var monitorModel DBModels.MonitorInfo
 	DataUtil.CopyFields(&monitorModel, monitor,

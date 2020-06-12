@@ -53,6 +53,16 @@ func (p *Api) GetApi() error {
 	return nil
 }
 
+// 获取API
+func (p *Api) GetApiListByApiNameAndGroupName() ([]Api, error) {
+	var apiList []Api
+	if err := DB.DBConn().Find(&apiList, "api_name like ? and api_group like ? ", "%"+p.ApiName+"%", "%"+p.ApiGroup+"%").Error; err != nil {
+		ComponentUtil.RuntimeLog().Error(err)
+		return nil, err
+	}
+	return apiList, nil
+}
+
 func (p *Api) SaveApi() bool {
 	// 已存在更新，否则创建
 	exist := Api{}

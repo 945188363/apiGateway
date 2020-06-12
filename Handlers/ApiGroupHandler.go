@@ -43,13 +43,39 @@ func GetApiGroupList(ginCtx *gin.Context) {
 	})
 }
 
-func GetApiGroup(ginCtx *gin.Context) {
-	ginCtx.String(200, "prod api")
+func GetApiGroupListByGroupName(ginCtx *gin.Context) {
+	var apiGroup ApiGroup
+	ginCtx.ShouldBind(&apiGroup)
+	var apiGroupModel DBModels.ApiGroup
+	DataUtil.CopyFields(&apiGroupModel, apiGroup,
+		"ApiGroupName",
+		"Description")
+	ComponentUtil.RuntimeLog().Info("transfer data to Model :", apiGroupModel)
+	apiGroupList, err := apiGroupModel.GetApiGroupListByGroupName()
+	if err != nil {
+		ComponentUtil.RuntimeLog().Info("internal server error")
+		ginCtx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "internal server error",
+		})
+		return
+	}
+
+	if len(apiGroupList) == 0 {
+		ComponentUtil.RuntimeLog().Info("api group list do not exist")
+		ginCtx.JSON(404, gin.H{
+			"message": "api group list do not exist",
+		})
+	}
+	ComponentUtil.RuntimeLog().Info("query api group list success")
+	ginCtx.JSON(200, gin.H{
+		"message": "query api group list success",
+		"data":    apiGroupList,
+	})
 }
 
 func SaveApiGroup(ginCtx *gin.Context) {
 	var apiGroup ApiGroup
-	ginCtx.Bind(&apiGroup)
+	ginCtx.ShouldBind(&apiGroup)
 	var apiGroupModel DBModels.ApiGroup
 	DataUtil.CopyFields(&apiGroupModel, apiGroup,
 		"ApiGroupName",
@@ -71,7 +97,7 @@ func SaveApiGroup(ginCtx *gin.Context) {
 
 func DeleteApiGroup(ginCtx *gin.Context) {
 	var apiGroup ApiGroup
-	ginCtx.Bind(&apiGroup)
+	ginCtx.ShouldBind(&apiGroup)
 	var apiGroupModel DBModels.ApiGroup
 	DataUtil.CopyFields(&apiGroupModel, apiGroup,
 		"ApiGroupName",

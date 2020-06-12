@@ -53,7 +53,7 @@ func GetIpRestriction(ginCtx *gin.Context) {
 
 func SaveIpRestriction(ginCtx *gin.Context) {
 	var ipRestriction IpRestriction
-	ginCtx.Bind(&ipRestriction)
+	ginCtx.ShouldBind(&ipRestriction)
 	fmt.Println(ipRestriction)
 	var ipRestrictionModel DBModels.IpRestriction
 	DataUtil.CopyFields(&ipRestrictionModel, ipRestriction,

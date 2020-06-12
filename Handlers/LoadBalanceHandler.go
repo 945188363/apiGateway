@@ -43,9 +43,40 @@ func GetLoadBalanceList(ginCtx *gin.Context) {
 	})
 }
 
+// Api相关处理
+func GetLoadBalanceListByName(ginCtx *gin.Context) {
+	var loadBalance LoadBalance
+	ginCtx.ShouldBind(&loadBalance)
+	var loadBalanceModel DBModels.LoadBalance
+	DataUtil.CopyFields(&loadBalanceModel, loadBalance,
+		"Name",
+		"RegistryName",
+		"Strategy",
+		"ServiceName")
+	ComponentUtil.RuntimeLog().Info("transfer data to Model :", loadBalanceModel)
+	loadBalanceList, err := loadBalanceModel.GetLoadBalanceListByName()
+	if err != nil {
+		ComponentUtil.RuntimeLog().Info("fetch loadBalance list error")
+		ginCtx.JSON(502, gin.H{
+			"message": "fetch loadBalance list error",
+		})
+	}
+	if len(loadBalanceList) == 0 {
+		ComponentUtil.RuntimeLog().Info("loadBalance list do not exist")
+		ginCtx.JSON(404, gin.H{
+			"message": "loadBalance list do not exist",
+		})
+	}
+	ComponentUtil.RuntimeLog().Info("query loadBalance list success")
+	ginCtx.JSON(200, gin.H{
+		"message": "query loadBalance list success",
+		"data":    loadBalanceList,
+	})
+}
+
 func SaveLoadBalance(ginCtx *gin.Context) {
 	var loadBalance LoadBalance
-	ginCtx.Bind(&loadBalance)
+	ginCtx.ShouldBind(&loadBalance)
 	var loadBalanceModel DBModels.LoadBalance
 	DataUtil.CopyFields(&loadBalanceModel, loadBalance,
 		"Name",
@@ -69,7 +100,7 @@ func SaveLoadBalance(ginCtx *gin.Context) {
 
 func DeleteLoadBalance(ginCtx *gin.Context) {
 	var loadBalance LoadBalance
-	ginCtx.Bind(&loadBalance)
+	ginCtx.ShouldBind(&loadBalance)
 	var loadBalanceModel DBModels.LoadBalance
 	DataUtil.CopyFields(&loadBalanceModel, loadBalance,
 		"Name",

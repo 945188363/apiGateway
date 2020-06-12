@@ -24,6 +24,16 @@ func (p *ApiGroup) GetApiGroup() error {
 	return nil
 }
 
+func (p *ApiGroup) GetApiGroupListByGroupName() ([]ApiGroup, error) {
+	var apiGroupList []ApiGroup
+
+	if err := DB.DBConn().Find(&apiGroupList, "api_group_name like ? ", "%"+p.ApiGroupName+"%").Error; err != nil {
+		ComponentUtil.RuntimeLog().Error(err)
+		return nil, err
+	}
+	return apiGroupList, nil
+}
+
 func (p *ApiGroup) SaveApiGroup() bool {
 	// 已存在更新，否则创建
 	exist := ApiGroup{}

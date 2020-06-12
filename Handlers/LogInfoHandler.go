@@ -75,7 +75,7 @@ func GetLogInfoByType(ginCtx *gin.Context) {
 
 func SaveLogInfo(ginCtx *gin.Context) {
 	var logInfo LogInfo
-	ginCtx.Bind(&logInfo)
+	ginCtx.ShouldBind(&logInfo)
 	fmt.Println(logInfo)
 	var logInfoModel LogModel.LogInfo
 	DataUtil.CopyFields(&logInfoModel, logInfo,

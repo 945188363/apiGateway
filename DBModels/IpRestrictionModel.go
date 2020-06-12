@@ -22,7 +22,7 @@ func (p *IpRestriction) TableName() string {
 }
 
 func (p *IpRestriction) GetIpRestrictionByApi(api string) error {
-	if err := DB.DBConn().First(&p, "api_list like ? and global = ?", api, 0).Error; err != nil {
+	if err := DB.DBConn().First(&p, "api_list like ? and global = ?", "%"+api+"%", 0).Error; err != nil {
 		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}
@@ -30,7 +30,7 @@ func (p *IpRestriction) GetIpRestrictionByApi(api string) error {
 }
 
 func (p *IpRestriction) GetIpRestrictionByApiGroup(apiGroup string) error {
-	if err := DB.DBConn().First(&p, "api_group LIKE ? and  global = ?", apiGroup, 0).Error; err != nil {
+	if err := DB.DBConn().First(&p, "api_group LIKE ? and  global = ?", "%"+apiGroup+"%", 0).Error; err != nil {
 		ComponentUtil.RuntimeLog().Error(err)
 		return err
 	}

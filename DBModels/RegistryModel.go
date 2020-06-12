@@ -51,6 +51,15 @@ func (p *Registry) DeleteRegistry() bool {
 	return true
 }
 
+func (p *Registry) GetRegistryListByName() ([]Registry, error) {
+	var RegistryList []Registry
+	if err := DB.DBConn().Find(&RegistryList, "name like ? ", "%"+p.Name+"%").Error; err != nil {
+		ComponentUtil.RuntimeLog().Error(err)
+		return nil, err
+	}
+	return RegistryList, nil
+}
+
 func (p *Registry) GetRegistryList() ([]Registry, error) {
 	var RegistryList []Registry
 	if err := DB.DBConn().Find(&RegistryList).Error; err != nil {
