@@ -12,12 +12,15 @@ import (
 
 // 初始化路由
 func InitApiMapping(router *gin.Engine) {
-	// 鉴权
-	auth := Middlewares.AuthMw{}
-	router.Use(auth.BasicAuthMiddleware())
 	// 黑白名单
 	ipRestriction := Middlewares.IpRestrictionMw{}
 	router.Use(ipRestriction.GlobalIpRestrictionMiddleware())
+	// 鉴权
+	auth := Middlewares.AuthMw{}
+	router.Use(auth.BasicAuthMiddleware())
+	// 缓存
+	cache := Middlewares.CacheMw{}
+	router.Use(cache.CacheMiddleware())
 	// 参数校验
 	paramCheck := Middlewares.ParameterCheckMw{}
 	router.Use(paramCheck.ParameterCheckMiddleware())
@@ -43,8 +46,6 @@ func InitApiMapping(router *gin.Engine) {
 			breaker.Api = apiListGroup[i][j]
 			// 通过协议进行分类
 			if apiListGroup[i][j].ProtocolType == Config.Http {
-				// 中间件处理
-				httpInvoker.Api = apiListGroup[i][j]
 				if rateLimit.RateLimitNum > 0 {
 					router.Any(handleUrl(apiListGroup[i][j]),
 						count.CountMiddleware(),

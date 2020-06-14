@@ -69,9 +69,13 @@ func (c *RpcInvoker) InvokeMethod2(ctx context.Context, in *rpcService.RpcReques
 // gRpc协议的RPC调用
 func (p *RpcInvoker) Execute(ginCtx *gin.Context) {
 	value, exists := ginCtx.Get("ApiInfo")
-	if exists {
-		p.Api = value.(DBModels.Api)
+	if !exists {
+		ComponentUtil.RuntimeLog().Info("api info is null.")
+		return
 	}
+
+	p.Api = value.(DBModels.Api)
+
 	doneChan := make(chan Domain.Message)
 	go func(ctx context.Context) {
 		// 获取consul注册地址
@@ -164,9 +168,12 @@ func NewRpcService(api DBModels.Api, c client.Client) RpcService {
 func (p *HttpInvoker) Execute(ginCtx *gin.Context) {
 	// 获取api信息
 	value, exists := ginCtx.Get("ApiInfo")
-	if exists {
-		p.Api = value.(DBModels.Api)
+	if !exists {
+		ComponentUtil.RuntimeLog().Info("api info is null.")
+		return
 	}
+
+	p.Api = value.(DBModels.Api)
 
 	// 先获取该服务在注册中心的集群数量 通过负载均衡选在一个server
 	p.discovery()

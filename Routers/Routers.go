@@ -59,6 +59,8 @@ func NewGinRouter() *gin.Engine {
 
 	}
 	ginRouter.POST("/users", Handlers.GetUser)
-	Core.InitApiMapping(ginRouter)
+	// Core.InitApiMapping(ginRouter)
+	// 缓存服务
+	Core.InitAllApi(ginRouter)
 	return ginRouter
 }

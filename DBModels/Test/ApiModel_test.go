@@ -8,8 +8,8 @@ import (
 
 func TestAddApi(t *testing.T) {
 	testApi := DBModels.Api{
-		ApiName:          "2aa2222233",
-		ApiUrl:           "333",
+		ApiName: "2aa2222233",
+		ApiUrl:  "333",
 	}
 	isSuc := testApi.SaveApi()
 	fmt.Println(isSuc)
@@ -17,16 +17,15 @@ func TestAddApi(t *testing.T) {
 
 func TestDelApi(t *testing.T) {
 	testApi := DBModels.Api{
-		ApiName:          "22233",
+		ApiName: "22233",
 	}
 	isSuc := testApi.DeleteApi()
 	fmt.Println(isSuc)
 }
 
-
 func TestGetAllApi(t *testing.T) {
 	testApi := DBModels.Api{}
-	apiList, err:= testApi.GetApiList()
+	apiList, err := testApi.GetApiList()
 	if err != nil {
 		fmt.Println("error")
 		return
@@ -36,9 +35,9 @@ func TestGetAllApi(t *testing.T) {
 
 func TestGetApi(t *testing.T) {
 	testApi := DBModels.Api{
-		ApiName:"111",
+		ApiName: "111121312",
 	}
-	err:= testApi.GetApi()
+	err := testApi.GetApi()
 	if err != nil {
 		fmt.Println("error")
 		return

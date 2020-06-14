@@ -18,23 +18,27 @@ type BreakerMw struct {
 }
 
 func (mw *BreakerMw) CircuitBreakerMiddleware() gin.HandlerFunc {
-	cmdName := mw.ApiName + mw.ApiUrl
-	cmdConf := hystrix.CommandConfig{
-		Timeout:                mw.ApiTimeout,
-		MaxConcurrentRequests:  mw.RateLimitNum,
-		RequestVolumeThreshold: 5,
-		ErrorPercentThreshold:  20,
-		SleepWindow:            10000,
-	}
-	hystrix.ConfigureCommand(cmdName, cmdConf)
 	return func(c *gin.Context) {
 		ComponentUtil.RuntimeLog().Info("start Count MiddleWare...")
 		// 获取api信息
 		api, exists := c.Get("ApiInfo")
-		if exists {
-			mw.Api = api.(DBModels.Api)
+		if !exists {
+			ComponentUtil.RuntimeLog().Info("api info is null.")
+			c.Abort()
+			return
 		}
 
+		mw.Api = api.(DBModels.Api)
+		// 设置熔断信息
+		cmdName := mw.ApiName + mw.ApiUrl
+		cmdConf := hystrix.CommandConfig{
+			Timeout:                mw.ApiTimeout,
+			MaxConcurrentRequests:  mw.RateLimitNum,
+			RequestVolumeThreshold: 5,
+			ErrorPercentThreshold:  20,
+			SleepWindow:            10000,
+		}
+		hystrix.ConfigureCommand(cmdName, cmdConf)
 		// 执行hystrix策略
 		_ = hystrix.Do(cmdName, func() error {
 			ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(mw.ApiTimeout+100)*time.Millisecond)

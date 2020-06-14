@@ -14,12 +14,15 @@ type CountMw struct {
 func (mw *CountMw) CountMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ComponentUtil.RuntimeLog().Info("start Count MiddleWare...")
-		// 获取当前API信息
-		apiN := DBModels.Api{ApiUrl: handleUriGroup(c.Request.URL.Path)}
-		_ = apiN.GetApiByUrl()
-		mw.Api = apiN
-		c.Set("ApiInfo", mw.Api)
+		// 获取APi信息
+		api, exists := c.Get("ApiInfo")
+		if !exists {
+			ComponentUtil.RuntimeLog().Info("api info is null.")
+			c.Abort()
+			return
+		}
 
+		mw.Api = api.(DBModels.Api)
 		// 保存访问信息
 		count := DBModels.Count{
 			ApiName: mw.ApiName,

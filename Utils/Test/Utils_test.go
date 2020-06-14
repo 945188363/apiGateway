@@ -5,6 +5,7 @@ import (
 	"apiGateway/Utils/DataUtil"
 	"apiGateway/Utils/RedisUtil"
 	"fmt"
+	"github.com/garyburd/redigo/redis"
 	"testing"
 )
 
@@ -42,7 +43,17 @@ func TestMap2(t *testing.T) {
 }
 
 func TestRedis(t *testing.T) {
-	get, _ := RedisUtil.Get("Name")
+
+	// RedisUtil.Set("aaa","123123")
+
+	get, _ := redis.Bytes(RedisUtil.Get("Name"))
 
 	fmt.Println(get)
+}
+
+func TestDelRedisKey(t *testing.T) {
+
+	err := RedisUtil.Del("aaa")
+
+	fmt.Println(err)
 }

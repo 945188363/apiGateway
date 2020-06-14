@@ -3,6 +3,7 @@ package DBModels
 import (
 	"apiGateway/Common/DB"
 	"apiGateway/Utils/ComponentUtil"
+	"reflect"
 )
 
 type Api struct {
@@ -23,6 +24,10 @@ type Api struct {
 // 设置User的表名为`Api`
 func (p *Api) TableName() string {
 	return "Api"
+}
+
+func (p Api) IsEmpty() bool {
+	return reflect.DeepEqual(p, Api{})
 }
 
 // 通过组获取API
