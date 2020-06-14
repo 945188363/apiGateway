@@ -6,6 +6,7 @@ import (
 	"apiGateway/Utils/ComponentUtil"
 	"apiGateway/Utils/DataUtil"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"strings"
 )
 
@@ -33,6 +34,9 @@ func (mw *CacheMw) CacheMiddleware() gin.HandlerFunc {
 			err := apiN.GetApiByUrl()
 			// 数据库也没有就终止访问
 			if err != nil {
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"error": "api is not register in api gateway",
+				})
 				c.Abort()
 				ComponentUtil.RuntimeLog().Info("this api is NOT registry in apiGateway.")
 				return
